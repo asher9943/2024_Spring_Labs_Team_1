@@ -3,3 +3,6 @@
 
 # vscode workspaces
 *.code-workspace
+
+# vscode properties
+/.vscode/*
