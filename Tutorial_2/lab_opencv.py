@@ -1,9 +1,10 @@
-
-# import opencv 
 import cv2 
-  
+
+
+#------------------------[Part 1]------------------------#
+
 # Load the input image 
-imageO = cv2.imread('/home/paint/lab_env/young_man_portrait_beard_young_man_male_handsome_young_man_handsome-1046502-728629612.jpg') 
+imageO = cv2.imread('/home/paint/Documents/School/asdasd/2024_Spring_Labs_Team_1_DonaldFork/Tutorial_2/young_man_portrait_beard_young_man_male_handsome_young_man_handsome-1046502-728629612.jpg') 
 cv2.imshow('Original', imageO) 
 cv2.waitKey(0) 
   
@@ -13,6 +14,8 @@ gray_image = cv2.cvtColor(imageO, cv2.COLOR_BGR2GRAY)
 cv2.imshow('Grayscale', gray_image) 
 cv2.waitKey(0)   
 
+
+#------------------------[Part 2]------------------------#
 # Display Sobel Edge Detection Images
 edges = cv2.Canny(image=imageO, threshold1=100, threshold2=180)
 
@@ -24,8 +27,8 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 
 
-#
-image_path = "/home/paint/lab_env/young_man_portrait_beard_young_man_male_handsome_young_man_handsome-1046502-728629612.jpg"
+#------------------------[Part 3]------------------------#
+image_path = "/home/paint/Documents/School/asdasd/2024_Spring_Labs_Team_1_DonaldFork/Tutorial_2/young_man_portrait_beard_young_man_male_handsome_young_man_handsome-1046502-728629612.jpg"
 window_name = f"Detected Objects in {image_path}"
 original_image = cv2.imread(image_path)
 

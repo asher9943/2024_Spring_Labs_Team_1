@@ -1,24 +1,34 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 import matplotlib as mpl
 from matplotlib import cm
 from scipy import linalg, optimize, fft
 
-#------------------------[Part 3]------------------------#
+
+#------------------------[Part 1]------------------------#
 A = np.matrix('[3,1]; [1,2]')
 b = np.matrix('[9]; [8]')
 
 x = np.linalg.solve(A, b)
-print(x)
 
-#------------------------[Part 3]------------------------#
+print("Part 1")
+print(x)
+print()
+print("------------------")
+
+
+#------------------------[Part 2]------------------------#
 def f(x):
     return x**2 + 2*x
 
 res = optimize.minimize_scalar(f)
+
+print("Part 2")
 print(res)
+print()
+print("------------------")
+
 
 #------------------------[Part 3]------------------------#
 t = np.linspace(0,160)
