@@ -21,11 +21,11 @@ const unsigned int M2_I_SENSE = 34;
 
 const float M_I_COUNTS_TO_A = (3.3 / 1024.0) / 0.120;
 
-const unsigned int PWM_VALUE = 512; // Max PWM given 8 bit resolution
+const unsigned int PWM_VALUE = 225; // Max PWM given 8 bit resolution
 
 const int freq = 5000;
 const int ledChannel = 0;
-const int resolution = 10;
+const int resolution = 8;
 
 bool status = false;
 
@@ -44,6 +44,7 @@ void M1_stop() {
   ledcWrite(M1_IN_2_CHANNEL, PWM_VALUE);
 }
 
+
 void M2_backward() {
   ledcWrite(M2_IN_1_CHANNEL, PWM_VALUE);
   ledcWrite(M2_IN_2_CHANNEL, 0);
@@ -58,6 +59,7 @@ void M2_stop() {
   ledcWrite(M2_IN_1_CHANNEL, PWM_VALUE);
   ledcWrite(M2_IN_2_CHANNEL, PWM_VALUE);
 }
+
 
 void setup() {
   // Stop the right motor by setting pin 14 low

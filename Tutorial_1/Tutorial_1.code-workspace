@@ -1,0 +1,32 @@
+{
+	"folders": [
+		{
+			"path": "Buzzer"
+		},
+		{
+			"name": "Encoders",
+			"path": "Encoders"
+		},
+		{
+			"name": "IMU",
+			"path": "IMU"
+		},
+		{
+			"name": "Line_Follow",
+			"path": "Line_Follow"
+		},
+		{
+			"name": "Line_Sensor_ADC",
+			"path": "Line_Sensor_ADC"
+		},
+		{
+			"name": "Motors",
+			"path": "Motors"
+		},
+		{
+			"name": "Motors_Encoders",
+			"path": "Motors_Encoders"
+		}
+	],
+	"settings": {}
+}
