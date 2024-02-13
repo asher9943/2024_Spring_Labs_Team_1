@@ -23,18 +23,18 @@ void readADC() {
 void digitalConvert(){
   for (int i = 0; i < 7; i++) {
     if (adc1_buf[i]>300) {
-      lineArray[2*i] = 1; 
+      lineArray[2*i] = 0; 
     } else {
-      lineArray[2*i] = 0;
+      lineArray[2*i] = 1;
     }
     Serial.print(lineArray[2*i]); Serial.print("\t");
     // Serial.print(adc1_buf[i]); Serial.print("\t");
 
     if (i<6) {
       if (adc2_buf[i]>300){
-        lineArray[2*i+1] = 1;
-      } else {
         lineArray[2*i+1] = 0;
+      } else {
+        lineArray[2*i+1] = 1;
       }
       Serial.print(lineArray[2*i+1]); Serial.print("\t");
       // Serial.print(adc2_buf[i]); Serial.print("\t");

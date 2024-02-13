@@ -1,0 +1,8 @@
+# python virtual enviroment
+.venv/*
+
+# vscode workspaces
+*.code-workspace
+
+# vscode properties
+/.vscode/*

@@ -22,11 +22,11 @@ const unsigned int M2_I_SENSE = 34;
 
 // const float M_I_COUNTS_TO_A = (3.3 / 1024.0) / 0.120;
 
-const unsigned int PWM_VALUE = 512; // Max PWM given 8 bit resolution
+const unsigned int PWM_VALUE = 225; // Max PWM given 8 bit resolution
 
 const int freq = 5000;
 const int ledChannel = 0;
-const int resolution = 10;
+const int resolution = 8;
 
 int adc1_buf[8];
 int adc2_buf[8];
@@ -87,18 +87,18 @@ void readADC() {
 void digitalConvert(){
   for (int i = 0; i < 7; i++) {
     if (adc1_buf[i]>300) {
-      lineArray[2*i] = 1; 
+      lineArray[2*i] = 0; 
     } else {
-      lineArray[2*i] = 0;
+      lineArray[2*i] = 1;
     }
     Serial.print(lineArray[2*i]); Serial.print("\t");
     // Serial.print(adc1_buf[i]); Serial.print("\t");
 
     if (i<6) {
       if (adc2_buf[i]>300){
-        lineArray[2*i+1] = 1;
-      } else {
         lineArray[2*i+1] = 0;
+      } else {
+        lineArray[2*i+1] = 1;
       }
       Serial.print(lineArray[2*i+1]); Serial.print("\t");
       // Serial.print(adc2_buf[i]); Serial.print("\t");
