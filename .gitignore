@@ -6,3 +6,9 @@
 
 # vscode properties
 /.vscode/*
+
+.pio/
+
+lab-2/
+
+tutorial-3-env
