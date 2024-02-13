@@ -2,8 +2,8 @@
 #include <Adafruit_MCP3008.h>
 #include <Wire.h>
 
-Adafruit_MCP3008 adc1;
-Adafruit_MCP3008 adc2;
+//Adafruit_MCP3008 adc1;
+//Adafruit_MCP3008 adc2;
 
 const unsigned int ADC_1_CS = 2;
 const unsigned int ADC_2_CS = 17;
