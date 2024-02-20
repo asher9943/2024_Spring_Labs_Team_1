@@ -42,8 +42,8 @@ float error;
 float last_error;
 float total_error;
 
-float Kp = 3;
-float Kd = 100;
+float Kp = 8;
+float Kd = 125;
 float Ki = 0;
 
 void M1_backward(int pwm_value) {
@@ -164,7 +164,7 @@ void loop() {
   float pos = getPosition(previousPosition);
   previousPosition = pos;
 
-  error = pos - mid;
+  error = pos - mid + 1;
   total_error += error;
 
   int pid_value = Kp*error + Kd*(error-last_error) + Ki*total_error;
@@ -175,12 +175,35 @@ void loop() {
   M2_forward(left_motor);
 
   // Serial.print("time: \t"); Serial.print(t_end - t_start); Serial.print("\t");
-  Serial.print("pos: \t"); Serial.print(pos);
+  // Serial.print("pos: \t"); Serial.print(pos);
   Serial.print("error: \t"); Serial.print(error);
   Serial.print(" right: \t"); Serial.print(right_motor); Serial.print(" left: \t"); Serial.print(left_motor); 
   Serial.println();
 
 
+  if(lineArray[0] == 1) {
+      while (pos <= mid + 1) {
+        M1_forward(base_pid);
+        M2_forward(0);
+
+        readADC();
+        digitalConvert();
+        pos = getPosition(previousPosition);
+        previousPosition = pos;
+        Serial.print("pos: \t"); Serial.println(pos);
+      }
+  } else if(lineArray[12] == 1) {
+      while (pos >= mid + 1) {
+        M1_forward(0);
+        M2_forward(base_pid);
+
+        readADC();
+        digitalConvert();
+        pos = getPosition(previousPosition);
+        previousPosition = pos;
+        Serial.print("pos: \t"); Serial.println(pos);
+      }
+  }
   last_error = error;
 
   // delay(100);
