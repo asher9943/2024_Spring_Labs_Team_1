@@ -183,37 +183,37 @@ void loop() {
   Serial.print(" right: \t"); Serial.print(right_motor); Serial.print(" left: \t"); Serial.print(left_motor); 
   Serial.println();
 
-  //wheel diam = 3.3cm
+  //wheel diam = 33mm
+  // 10.91 ticks per mm
+  // ticks = 10.91*distance(mm)*correction
   //
-  // if(lineArray[0] == 1) {
-  //     enc_base = enc1.read();
-  //     enc_value = enc_base;
+  if(lineArray[0] == 1 || lineArray[12] == 1) {
+    enc_base = enc1.read();
+    enc_value = enc_base;
 
-  //     while (abs(enc_value-enc_base) < 576) {
-  //       M1_forward(base_pid);
-  //       M2_forward(base_pid);
+    // move forward until axis is aligned
+    M1_forward(base_pid);
+    M2_forward(base_pid);
+    while(abs(enc_value-enc_base) < 785) {
+      enc_value = enc1.read();
+    }
 
-  //       enc_value = enc1.read();
-  //     }
-  //     enc_base = enc1.read();
-  //     enc_value = enc_base;
-  //     while (abs(enc_value-enc_base) < 270) {
-  //       M1_forward(base_pid);
-  //       M2_backward(base_pid);
+    // turn 90 degrees
+    if(lineArray[0] == 1) {
+      M1_forward(base_pid);
+      M2_backward(base_pid);
+    } else {
+      M1_backward(base_pid);
+      M2_forward(base_pid);
+    }
+    enc_base = enc1.read();
+    enc_value = enc_base;
+    while(abs(enc_value-enc_base) < 180) {
+      enc_value = enc1.read();
+    }
 
-  //       enc_value = enc1.read();
-  //     }
-  // } else if(lineArray[12] == 1) {
-  //     enc_base = enc1.read();
-      
-  //     // while () {
-  //     //   M1_forward(0);
-  //     //   M2_forward(base_pid);
+  }
 
-  //     //   enc_value = enc1.read();
-  //     // }
-  // }
   last_error = error;
-
 
 }
