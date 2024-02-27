@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 
 cap = cv.VideoCapture(0)
-haar_cascade = cv.CascadeClassifier('Haarcascade_frontalface_default.xml') 
+haar_cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml') 
 
 if not cap.isOpened():
     print("Cannot open camera")
