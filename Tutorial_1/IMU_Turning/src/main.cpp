@@ -6,18 +6,18 @@
 // #define DEBUG
 
 // Parameters
-#define ANGLE_SCALE .00001 // Convert angle rate * delta t into degrees
-#define MIN_ANGLE 0.01 // Change in angle below with it should be clamped to 0 (reduce error)
-#define TURN_GOAL 90 // Amount to turn in degrees
-#define PWM_MAX 512 // 8 bit PWM max value, partially in here just as documentation
-#define FREQ 5000 // PWM params
-#define RESOLUTION 10
+#define YAW_DRIFT -0.005  // account for rotational drift in sensor
+#define CORRECTION 1.2    // angle correction (90: 1.23, 360: 1.1)
+#define PWM_MAX 255       // 8 bit PWM max value, partially in here just as documentation
+#define FREQ 5000         // PWM params
+#define RESOLUTION 8
 
 // Globals, mostly pin declarations
 Adafruit_MPU6050 mpu;
 
 const unsigned int ADC_1_CS = 2;
 const unsigned int ADC_2_CS = 17;
+
 const unsigned int M1_IN_1 = 13;
 const unsigned int M1_IN_2 = 12;
 const unsigned int M2_IN_1 = 25;
@@ -60,46 +60,42 @@ void M2_stop() {
 
 // Turns in appropriate direction, using integral for angle until is reached, then stops motors
 void turn_angle(float goal) {
-  // A struct that holds mpu reading
-  sensors_event_t a, g, temp;
-
-  bool cw; // keep track of direction so we can account for a little overshoot
-  float curr_angle = 0;
-  unsigned long t_delta;
+  sensors_event_t a, g, temp; // A struct that holds mpu reading
+  float curr_angle = 0;       // current angle of mouse
+  float g_0 = 0;              // current g.gyro.z reading
+  float g_1 = 0;              // previous g.gyto.z reading (delay of 1)
+  unsigned long t_delta;      // change in milis() time (ms)
+  unsigned long t_prev;       // previous milis() time (ms)
 
   // Start counting time just before motors first move 
-  t_delta = millis();
+  t_prev = millis();
 
   // Turn to correct direction
-  if (curr_angle < goal) {
-    cw = false;
-    M1_backward(300);
-    M2_forward(300);
-
-  }
-  else if (curr_angle > goal) {
-    cw = true;
-    M1_forward(300);
-    M2_backward(300);
+  if (goal > 0) {
+    M1_forward(80);
+    M2_backward(90);
+  } else {
+    M1_backward(90);
+    M2_forward(80);
   }
 
   // Poll angle until goal is reached
-  while ((!cw && curr_angle <= goal) || (cw && curr_angle >= goal)) {
+  while (abs(curr_angle) < abs(goal)) {
     // Latest MPU update
     mpu.getEvent(&a, &g, &temp);
+    g_0 = g.gyro.z - YAW_DRIFT;
   
     // Update time elapsed
-    t_delta = millis() - t_delta;
+    t_delta = millis() - t_prev;
+    t_prev = t_delta + t_prev;
   
     // Run the integral and increment angle
-    // Rate is rad/s, time in ms, so should div by 1000
-    // Should be multiplying by 180/pi for the rad
-    // But I found this offset works better while testing
-    // Also it misrepresents sitting still as a small increment in angle,
-    // But that adds up
-    if (abs(t_delta*g.gyro.z*ANGLE_SCALE) > MIN_ANGLE)
-      curr_angle += t_delta*g.gyro.z*ANGLE_SCALE;
+    // t_delta is in ms, so multiply by 0.001
+    // need to convert rad to deg, so it is multipled by 180/3.1416
+    curr_angle += CORRECTION*(180/3.1416)*(t_delta*0.001)*(g_0 + g_1)/2;
 
+    g_1 = g_0;
+    
     #ifdef DEBUG
       Serial.print("Current angle: ");
       Serial.print(curr_angle);
@@ -112,13 +108,7 @@ void turn_angle(float goal) {
 }
 
 void setup() {
-  // Stop the right motor by setting pin 14 low
-  // this pin floats high or is pulled
-  // high during the bootloader phase for some reason
-  pinMode(14, OUTPUT);
-  digitalWrite(14, LOW);
-  delay(100);
-
+  
   // Serial will only be used for debugging
   #ifdef DEBUG
     Serial.begin(115200);
@@ -144,6 +134,9 @@ void setup() {
   digitalWrite(ADC_1_CS, HIGH); // Without this the ADC's write
   digitalWrite(ADC_2_CS, HIGH); // to the SPI bus while the nRF24 is!!!!
 
+  M1_stop();
+  M2_stop();
+
   while (!mpu.begin())
     delay(10);
 
@@ -157,5 +150,13 @@ void setup() {
 
 void loop() {
   turn_angle(90.0);
+  delay(2000);
+  turn_angle(90.0);
+  delay(2000);
+  turn_angle(90.0);
+  delay(2000);
+  turn_angle(90.0);
+  delay(2000);
+  turn_angle(-360.0);
   delay(2000);
 }
