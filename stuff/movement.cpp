@@ -22,7 +22,7 @@ const unsigned int M2_IN_2_CHANNEL = 11;
 const unsigned int M1_I_SENSE = 35;
 const unsigned int M2_I_SENSE = 34;
 
-const unsigned int PWM_BASE = 85;
+const unsigned int PWM_BASE = 90;
 const unsigned int PWM_MAX = 255;
 const unsigned int PWM_MIN = 68;
 
@@ -242,30 +242,48 @@ void updateAngle(float *curr_angle, float *g_prev, unsigned long *t_prev) {
 
 
 /*
- *  Moves the mouse forward (or backward) by a certain amount
+ *  Moves the mouse forward (or backward) by a certain amount, used IMU for PID
  *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
  *    goal_mm - Amount to move forward (mm)
  *      goal_mm > 0 - Move forward
  *      goal_mm < 0 - Move backward
  */
 void moveForward(Encoder enc1, float goal_mm) {
+  long goal_tick = ceil(3.581*goal_mm);
   long enc_base = enc1.read();
   long enc_value = enc_base;
-  long goal_tick = ceil(3.581*goal_mm);
 
-  // forward vs backward
-  if(goal_tick > 0) {
-    M1_forward(PWM_BASE);
-    M2_forward(PWM_BASE);
-  } else {
-    M1_backward(PWM_BASE);
-    M2_backward(PWM_BASE);
-  }
+  float g_prev = 0;
+  unsigned long t_prev = millis(); 
+
+  float error = 0;
+  float prev_error = 0;
+  float total_error = 0;
+  float Kp = 2.5;
+  float Kd = 50;
+  float Ki = 0.015;
+  int   pid_val = 0;
+
   
-  // add PID with IMU to go straight?
+  // Poll until encoder goal is reached
+  while(abs(enc_value-enc_base) < abs(goal_tick)) {
+    updateAngle(&error, &g_prev, &t_prev);
+    total_error += error;
 
-  // Poll until encoder goal reached
-  while(abs(enc_value-enc_base) < abs(goal_tick)) enc_value = enc1.read();
+    pid_val = Kp*error + Kd*(error-prev_error) + Ki*total_error;
+  
+    prev_error = error;
+
+    if(goal_tick > 0) {
+      M1_forward(PWM_BASE + pid_val);
+      M2_forward(PWM_BASE - pid_val);
+    } else {
+      M1_backward(PWM_BASE + pid_val);
+      M2_backward(PWM_BASE - pid_val);
+    }
+
+    enc_value = enc1.read();
+  }
 
   M1_stop();
   M2_stop();

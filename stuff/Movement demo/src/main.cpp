@@ -22,9 +22,9 @@ void loop() {
   Encoder enc1(M1_ENC_A, M1_ENC_B);
   Encoder enc2(M2_ENC_A, M2_ENC_B);
  
+  delay(2000);
+
   while(true) {
-    delay(750);
-    
     turnCorner(enc1, true);
     delay(750);
 
@@ -44,7 +44,11 @@ void loop() {
     delay(750);
 
     moveForward(enc1, -75);
-    
+    delay(750);
+
+    // moveForward(enc1, 10000);
+    // delay(5000);
+
     Serial.println();
   }
 }
