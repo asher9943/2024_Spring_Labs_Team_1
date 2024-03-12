@@ -141,5 +141,10 @@ void turnAngle(float goal);
  */
 void turnCorner(Encoder enc1, bool ccw);
 
+/*
+ *  Follows a line, function updates the lineFollow PID
+ *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
+ */
+void lineFollow(Encoder enc1);
 
 #endif

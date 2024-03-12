@@ -25,29 +25,17 @@ void loop() {
   delay(2000);
 
   while(true) {
-    turnCorner(enc1, true);
-    delay(750);
+    // turnCorner(enc1, true);   delay(750);
+    // turnAngle(-90);           delay(750);
+    // turnCorner(enc1, false);  delay(750);
+    // turnAngle(270);           delay(750);
+    // moveForward(enc1, 75);    delay(750);
+    // turnAngle(-180);          delay(750);
+    // moveForward(enc1, -75);   delay(750);
 
-    turnAngle(-90);
-    delay(750);
+    // moveForward(enc1, 10000); delay(5000);
 
-    turnCorner(enc1, false);
-    delay(750);
-
-    turnAngle(270);
-    delay(750);
-
-    moveForward(enc1, 75);
-    delay(750);
-
-    turnAngle(-180);
-    delay(750);
-
-    moveForward(enc1, -75);
-    delay(750);
-
-    // moveForward(enc1, 10000);
-    // delay(5000);
+    lineFollow(enc1);
 
     Serial.println();
   }

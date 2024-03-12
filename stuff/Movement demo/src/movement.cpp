@@ -259,10 +259,11 @@ void moveForward(Encoder enc1, float goal_mm) {
   float error = 0;
   float prev_error = 0;
   float total_error = 0;
+
+  int   pid_val = 0;
   float Kp = 2.5;
   float Kd = 50;
   float Ki = 0.015;
-  int   pid_val = 0;
 
   
   // Poll until encoder goal is reached
@@ -344,5 +345,48 @@ void turnCorner(Encoder enc1, bool ccw) {
 }
 
 
+/*
+ *  Follows a line, function updates the lineFollow PID
+ *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
+ */
+void lineFollow(Encoder enc1) {
+  static float prev_pos = LINE_MID;
+  float pos;
 
+  static float error = 0;
+  static float prev_error = 0;
+
+  static int pid_val = 0;
+  float Kp = 2.5;
+  float Kd = 50;
+  
+
+  // PID
+  readLineSensor();
+  pos = getPosition(pos_prev);
+
+  error = pos - LINE_MID;
+
+  pid_val = Kp*error + Kd*(error-prev_error);
+
+  // apply PID
+  M1_forward(PWM_BASE + pid_val);
+  M2_forward(PWM_BASE - pid_val);
+
+
+  // check for corner
+  if((lineArray[0] == 1 || lineArray[12] == 1) && abs(error) <= 4) {
+      if((lineArray[0] == 1) && !(lineArray[12] == 1)) {
+        turnCorner(enc1, false);
+      } else if(!(lineArray[0] == 1) && (lineArray[12] == 1)) {
+        turnCorner(enc1, true);
+      }
+      
+    }
+
+
+  // update "previous" values
+  pos_prev = pos;
+  prev_error = error;
+}
 
