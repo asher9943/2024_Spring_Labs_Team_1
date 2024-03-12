@@ -73,6 +73,7 @@ void loop() {
 // Movement initialization, put in setup()
 void movement_Init();
 
+
 // Basic motor control functions (M1 is left, M2 is right)
 void M1_forward(int pwm_value);
 void M2_forward(int pwm_value);
@@ -91,12 +92,11 @@ void readLineSensor();
 
 /* 
  * Using line sensor data, find position of mouse on line
- *   pos_prev - Previous "pos" value, used in case mouse gets off track
  * 
  * return
  *   pos - Current position of mouse on line
  */
-float getPosition(float previousPosition);
+float getLinePosition();
 
 
 // MPU functions
@@ -118,13 +118,13 @@ void updateAngle(float *curr_angle, float *g_prev, unsigned long *t_prev);
 // Movement functions
 
 /*
- *  Moves the mouse forward (or backward) by a certain amount, used IMU for PID
- *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
+ *  Moves the mouse forward (or backward) by a certain amount
+ *    enc1 - Pointer to encoder 1 (can also be enc2)
  *    goal_mm - Amount to move forward (mm)
  *      goal_mm > 0 - Move forward
  *      goal_mm < 0 - Move backward
  */
-void moveForward(Encoder enc1, float goal_mm);
+void moveForwardDist(Encoder enc1, float goal_mm);
 
 /*
  *  Turns the mouse by a specified amount
@@ -136,15 +136,21 @@ void turnAngle(float goal);
 
 /*
  *  Turns a corner using encoders and the IMU
- *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
+ *    enc1 - Pointer to encoder 1 (can also be enc2)
  *    ccw  - If true, turns the mouse counter clock-wise
  */
 void turnCorner(Encoder enc1, bool ccw);
 
 /*
+ *  Moves the mouse forward (or backward) using IMU for PID
+ *    forward - If true mouse moves forward, else it moves backward
+ */
+void updateMoveForwardPID(bool forward);
+
+/*
  *  Follows a line, function updates the lineFollow PID
  *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
  */
-void lineFollow(Encoder enc1);
+void updateLineFollow(Encoder enc1);
 
 #endif

@@ -7,7 +7,7 @@
  */
 
 // Motors
-#define M_BACK_BOOST 10     // PWM boost for reversing the motor
+#define M_BACK_BOOST 2     // PWM boost for reversing the motor
 
 const unsigned int M1_IN_1 = 13;
 const unsigned int M1_IN_2 = 12;
@@ -174,12 +174,11 @@ void readLineSensor() {
 
 /* 
  * Using line sensor data, find position of mouse on line
- *   pos_prev - Previous "pos" value, used in case mouse gets off track
  * 
  * return
  *   pos - Current position of mouse on line
  */
-float getPosition(float pos_prev) {
+float getLinePosition() {
   float pos = 0;
   uint8_t white_count = 0;
 
@@ -248,44 +247,29 @@ void updateAngle(float *curr_angle, float *g_prev, unsigned long *t_prev) {
  *      goal_mm > 0 - Move forward
  *      goal_mm < 0 - Move backward
  */
-void moveForward(Encoder enc1, float goal_mm) {
-  long goal_tick = ceil(3.581*goal_mm);
-  long enc_base = enc1.read();
-  long enc_value = enc_base;
-
-  float g_prev = 0;
-  unsigned long t_prev = millis(); 
-
-  float error = 0;
-  float prev_error = 0;
-  float total_error = 0;
-
-  int   pid_val = 0;
-  float Kp = 2.5;
-  float Kd = 50;
-  float Ki = 0.015;
-
+void moveForwardDist(Encoder enc1, float goal_mm) {
+  const float f_corr = -2.5;
+  const float b_corr = 1.5;
   
-  // Poll until encoder goal is reached
-  while(abs(enc_value-enc_base) < abs(goal_tick)) {
-    updateAngle(&error, &g_prev, &t_prev);
-    total_error += error;
-
-    pid_val = Kp*error + Kd*(error-prev_error) + Ki*total_error;
+  long goal_tick = 3.581*goal_mm;
   
-    prev_error = error;
-
-    if(goal_tick > 0) {
-      M1_forward(PWM_BASE + pid_val);
-      M2_forward(PWM_BASE - pid_val);
-    } else {
-      M1_backward(PWM_BASE + pid_val);
-      M2_backward(PWM_BASE - pid_val);
-    }
-
-    enc_value = enc1.read();
+  long enc_value = enc1.read();
+  long enc_base = enc_value;
+  
+  
+  // move motors
+  if(goal_tick > 0) {
+    M1_forward(PWM_BASE + f_corr);
+    M2_forward(PWM_BASE - f_corr);
+  } else {
+    M1_backward(PWM_BASE - b_corr);
+    M2_backward(PWM_BASE + b_corr);
   }
 
+  // Poll until encoder goal is reached
+  while(abs(enc_value-enc_base) < abs(goal_tick)) enc_value = enc1.read();
+  
+  // stop motors
   M1_stop();
   M2_stop();
 }
@@ -325,14 +309,8 @@ void turnAngle(float goal) {
  *    ccw  - If true, turns the mouse counter clock-wise
  */
 void turnCorner(Encoder enc1, bool ccw) {
-  long enc_base = 0;
-  long enc_value = 0;
-
-  enc_base = enc1.read();
-  enc_value = enc_base;
-
-  // move forward until axis is aligned with corner
-  moveForward(enc1, 75);
+  // move forward until axis is aligned
+  moveForwardDist(enc1, 75);
 
   delay(50);
 
@@ -346,28 +324,85 @@ void turnCorner(Encoder enc1, bool ccw) {
 
 
 /*
+ *  Moves the mouse forward (or backward) using IMU for PID
+ *    forward - If true mouse moves forward, else it moves backward
+ */
+void updateMoveForwardPID(bool forward) {
+  static float g_prev = 0;
+  static unsigned long t_prev = millis(); 
+
+  float pid_val = 0;
+  float Kp = 2.5;
+  float Kd = 50;
+  float Ki = 0.015;
+
+  static float error = 0;
+  static float prev_error = 0;
+  static float total_error = 0;
+
+
+  // too long between updates, reset PID
+  if((millis() - t_prev) >= 500) {
+    g_prev = 0;
+    t_prev = millis(); 
+
+    error = 0;
+    prev_error = 0;
+    total_error = 0;
+  }
+
+
+  // update PID
+  updateAngle(&error, &g_prev, &t_prev);
+  total_error += error;
+
+  pid_val = Kp*error + Kd*(error-prev_error) + Ki*total_error;
+  
+  prev_error = error;
+
+  // apply PID
+  if(forward) {
+    M1_forward(PWM_BASE + pid_val);
+    M2_forward(PWM_BASE - pid_val);
+  } else {
+    M1_backward(PWM_BASE - pid_val);
+    M2_backward(PWM_BASE + pid_val);
+  }
+}
+
+
+
+/*
  *  Follows a line, function updates the lineFollow PID
  *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
  */
 void lineFollow(Encoder enc1) {
-  static float prev_pos = LINE_MID;
+  static float t_prev = millis();
   float pos;
 
   static float error = 0;
   static float prev_error = 0;
 
-  static int pid_val = 0;
+  float pid_val = 0;
   float Kp = 2.5;
   float Kd = 50;
   
+  // too long between updates, reset PID
+  if((millis() - t_prev) >= 500) {
+    error = 0;
+    prev_error = 0;
+  }
+  t_prev = millis(); 
 
-  // PID
+
+  // update PID
   readLineSensor();
-  pos = getPosition(pos_prev);
 
+  pos = getLinePosition();
   error = pos - LINE_MID;
 
   pid_val = Kp*error + Kd*(error-prev_error);
+
 
   // apply PID
   M1_forward(PWM_BASE + pid_val);
@@ -376,13 +411,12 @@ void lineFollow(Encoder enc1) {
 
   // check for corner
   if((lineArray[0] == 1 || lineArray[12] == 1) && abs(error) <= 4) {
-      if((lineArray[0] == 1) && !(lineArray[12] == 1)) {
-        turnCorner(enc1, false);
-      } else if(!(lineArray[0] == 1) && (lineArray[12] == 1)) {
-        turnCorner(enc1, true);
-      }
-      
-    }
+    if((lineArray[0] == 1) && !(lineArray[12] == 1)) {
+      turnCorner(enc1, false);
+    } else if(!(lineArray[0] == 1) && (lineArray[12] == 1)) {
+      turnCorner(enc1, true);
+    }    
+  }
 
 
   // update "previous" values

@@ -1,4 +1,7 @@
 #include <Arduino.h>
+#include <Adafruit_MCP3008.h>
+#include <Adafruit_MPU6050.h>
+#include <Encoder.h>
 
 #include "movement.hpp"
 
@@ -22,18 +25,38 @@ void loop() {
   delay(2000);
 
   while(true) {
-    // turnCorner(enc1, true);   delay(750);
-    // turnAngle(-90);           delay(750);
-    // turnCorner(enc1, false);  delay(750);
-    // turnAngle(270);           delay(750);
-    // moveForward(enc1, 75);    delay(750);
-    // turnAngle(-180);          delay(750);
-    // moveForward(enc1, -75);   delay(750);
+    
+    /*            Turning Demo            */
 
-    // moveForward(enc1, 10000); delay(5000);
+    // turnCorner(enc1, true);     delay(750);
+    // turnAngle(-90);             delay(750);
+    // turnCorner(enc1, false);    delay(750);
+    // turnAngle(270);             delay(750);
+    // moveForwardDist(enc1, 75);  delay(750);
+    // turnAngle(-180);            delay(750);
+    // moveForwardDist(enc1, -75); delay(750);
 
-    lineFollow(enc1);
 
-    Serial.println();
+    /*       Straignt line PID Demo       */
+
+    // for(int i = 0; i < 1000; i++) {
+    //   updateMoveForwardPID(true);
+    // }
+    // M1_stop();
+    // M2_stop();
+    // delay(1000);
+    // for(int i = 0; i < 1000; i++) {
+    //   updateMoveForwardPID(false); 
+    // }
+    // M1_stop();
+    // M2_stop();
+    // delay(1000);
+
+
+    /*           Line Follow Demo           */
+
+    // lineFollow(enc1);
+    // delay(50);
+
   }
 }
