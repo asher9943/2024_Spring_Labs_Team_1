@@ -1,7 +1,4 @@
 #include <Arduino.h>
-#include <Encoder.h>
-#include <Adafruit_MCP3008.h>
-#include <Adafruit_MPU6050.h>
 
 #include "movement.hpp"
 
