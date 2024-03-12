@@ -118,7 +118,7 @@ void updateAngle(float *curr_angle, float *g_prev, unsigned long *t_prev);
 // Movement functions
 
 /*
- *  Moves the mouse forward (or backward) by a certain amount
+ *  Moves the mouse forward (or backward) by a certain amount, used IMU for PID
  *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
  *    goal_mm - Amount to move forward (mm)
  *      goal_mm > 0 - Move forward
@@ -141,5 +141,10 @@ void turnAngle(float goal);
  */
 void turnCorner(Encoder enc1, bool ccw);
 
+/*
+ *  Follows a line, function updates the lineFollow PID
+ *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
+ */
+void lineFollow(Encoder enc1);
 
 #endif
