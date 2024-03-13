@@ -15,9 +15,6 @@ extern WiFiServer server;
 // Client
 extern WiFiClient client;
 
-// Stores data from client
-extern String client_line;
-
 
 
 /******************************************************************
@@ -25,12 +22,40 @@ extern String client_line;
  ******************************************************************
  */
 
-// Wifi initialization, put in setup()
-void heltec_Wifi_Init();
+// Wifi and server initialization
+void wifi_Init();
+void server_Init();
+void client_Init();
+
 
 /*
- * Connect to client and read data
+ * Check for clients and check their connection
+ *
+ * return
+ *   0 - Client unavalible (No client/client disconneced)
+ *   1 - Client connected
  */
-void process_client();
+int client_check();
+
+/*
+ * Read data from client
+ *
+ * return
+ *   0 - Client unavalible (No client/client disconneced)
+ *   1 - Client connected, no data
+ *   2 - Data avalible
+ */
+int client_read(String *client_rx_buff);
+
+/*
+ * Write data to client
+ *
+ * return
+ *   0 - Client unavalible (No client/client disconneced)
+ *   1 - Data sent
+ */
+int client_write(String client_tx_buff);
+
+
 
 #endif
