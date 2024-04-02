@@ -9,6 +9,8 @@
 
 const char *ssid = "carpeted-kitchen";
 const char *password = "czkm443@";
+
+const char *serverName = "198.162.46.240";
 const int serverPort = 80;
 
 // Set web server port number to 80
@@ -16,9 +18,6 @@ WiFiServer server(serverPort);
 
 // Client
 WiFiClient client;
-
-// Stores data from client
-String client_buff = "";
 
 
 
@@ -29,70 +28,145 @@ String client_buff = "";
 
 
 /*
- * Wifi server initialization, put in setup()
+ * Initialization
  */
-void heltec_Wifi_Init() {
-  // Connect to Wi-Fi network with SSID and password
+
+
+/*
+ * Wifi initialization, put in setup()
+ */
+void wifi_Init() {
   Serial.print("Connecting to ");
   Serial.print(ssid);
 
+  // Connect to Wi-Fi network with SSID and password
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
+  while(WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  delay(100);
 
-  // Print local IP address and start web server
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.print  ("IP address: ");
+  // Print local IP address
+  Serial.println("\n\nWiFi connected");
+  Serial.print  ("IP address:  ");
   Serial.println(WiFi.localIP());
-  Serial.print  ("Port:       ");
-  Serial.println(serverPort);
   Serial.println("");
-
-  server.begin();
-
-  client = server.available(); 
 }
 
 
 /*
- * Connect to client and read data
+ * Tell server to start listening for clients, put in setup()
  */
-void process_client() {
-  if(!client) {                   // If there is no client
+void server_Init() {
+  server.begin();
+
+  Serial.print  ("Server created, listening to port ");
+  Serial.println(serverPort);
+  Serial.println("");
+}
+
+
+/*
+ * Connect to server, put in setup()
+ */
+void client_Init() {
+  Serial.print("Connecting to ");
+  Serial.print(serverName);
+  Serial.print(" at port ");
+  Serial.print(serverPort);
+
+  while(!client.connect(serverName, serverPort)) {
+      delay(500);
+      Serial.print(".");
+  }
+
+  Serial.println("\nConnected");
+}
+
+
+
+/*
+ * Communication functions
+ */
+
+
+/*
+ * Check for clients and check their connection
+ *
+ * return
+ *   0 - Client unavalible (No client/client disconneced)
+ *   1 - Client connected
+ */
+int client_check() {
+  // If there is currently no client, try to find one
+  if(!client) {
     client = server.available();    // Listen for incoming clients
-    if(!client) return;             // No clients
+    if(!client) return 0;           // return 0 if no clients
     
     Serial.println("New client");
   }
 
-  if(client.connected()) {        // if the client is connected
-    if(client.available()) {        // if there is data to be read
-      // read data
-      while(client.available()) {
-        char c = client.read();
-        if((c == '\r') || (c == '\n')) break;
-        client_buff += c;
-      }
-      Serial.println(client_buff);
-
-      // process command
-    
-      // disconnect client
-      if(client_buff == "disconnect") {
-        client.stop();
-        Serial.println("\nClient disconnected\n");
-      }
-    
-      client_buff = "";
-    }
-  } else {
-    // client is disconnected
+  if(client.connected()) {    // The client is connected
+    return 1;
+  } else {                    // The client has disconnected
     client.stop();
     Serial.println("\nClient disconnected\n");
+    return 0;
   }
 }
 
+
+/*
+ * Read data from client
+ *
+ * return
+ *   0 - Client unavalible (No client/client disconneced)
+ *   1 - Client connected, no data
+ *   2 - Data avalible
+ */
+int client_read(String *client_rx_buff) {
+  if(client.connected()) {    // if the client is connected
+    if(client.available()) {    // if there is data to be read
+      // clear buffer
+      *client_rx_buff = "";
+
+      // read data
+      *client_rx_buff = client.readStringUntil('\n');
+      client.flush();
+    
+      // process command
+
+      return 2;
+    }
+    return 1;
+
+  } else {
+    // client has disconnected
+    client.stop();
+    Serial.println("\nClient disconnected\n");
+    return 0;
+  }
+}
+
+/*
+ * Write data to client
+ *
+ * return
+ *   0 - Client unavalible (No client/client disconneced)
+ *   1 - Data sent
+ */
+int client_write(String client_tx_buff) {
+  // if there is a client
+  if(client.connected()) {
+    client.println(client_tx_buff);
+    // client.println("");
+    client.flush();
+    return 1;
+  } else {
+
+    // client has disconnected
+    client.stop();
+    Serial.println("\nClient disconnected\n");
+    return 0;
+  }
+}

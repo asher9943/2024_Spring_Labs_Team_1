@@ -10,13 +10,39 @@ void setup() {
 
   Serial.begin(115200);
 
-  heltec_Wifi_Init();
+  wifi_Init();
+  server_Init();
 
   delay(100);
 }
 
 
 void loop(){
-  process_client();
+  String client_rx_buff = "";
+  String client_tx_buff = "";
+
+  /*               Echo Demo               */
+
+  if(client_check()) {
+    // if there is data to receive
+    if(client_read(&client_rx_buff) == 2) {
+      Serial.print(" - Recieved: ");
+      Serial.println(client_rx_buff);
+
+      client_tx_buff = client_rx_buff;
+    }
+
+    // if data was recieved
+    if(client_tx_buff != "") {
+      client_write(client_tx_buff);
+
+      Serial.print(" - Sent:     ");
+      Serial.println(client_tx_buff);
+
+      client_tx_buff = "";
+    }
+  }
+
+  delay(50);
 }
 
