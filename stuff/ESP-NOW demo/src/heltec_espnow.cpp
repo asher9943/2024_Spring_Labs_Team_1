@@ -7,9 +7,9 @@
  */
 
 // robot using the code
-#define USER_DONALD
-// #define USER_ASHER
-// #define USER_STEPHEN
+// #define PEER_DONALD
+// #define PEER_ASHER
+#define PEER_STEPHEN
 
 
 // messaging structure
@@ -20,7 +20,8 @@ typedef struct esp_message {
   bool d;
 } esp_message;
 
-esp_message espMessageData;
+esp_message espMessageDataTx;
+esp_message espMessageDataRx;
 
 
 // peer info
@@ -47,12 +48,12 @@ void heltec_espnow_Init(void) {
   
   
   esp_now_register_send_cb(OnDataSent_Callback);
-
+  esp_now_register_recv_cb(OnDataRecv_Callback);
 
   peerInfo.channel = 0;  
   peerInfo.encrypt = false;
 
-  #ifndef USER_DONALD
+  #ifdef PEER_DONALD
   memcpy(peerInfo.peer_addr, donaldAddr, 6);    
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
     Serial.println("Failed to add peer");
@@ -60,7 +61,7 @@ void heltec_espnow_Init(void) {
   }
   #endif
 
-  #ifndef USER_ASHER
+  #ifdef PEER_ASHER
   memcpy(peerInfo.peer_addr, asherAddr, 6);
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
     Serial.println("Failed to add peer");
@@ -68,7 +69,7 @@ void heltec_espnow_Init(void) {
   }
   #endif
 
-  #ifndef USER_STEPHEN
+  #ifdef PEER_STEPHEN
   memcpy(peerInfo.peer_addr, stephenAddr, 6);
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
     Serial.println("Failed to add peer");
@@ -81,4 +82,19 @@ void heltec_espnow_Init(void) {
 void OnDataSent_Callback(const uint8_t *mac_addr, esp_now_send_status_t status) {
   Serial.print("\r\nLast Packet Send Status:\t");
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}
+
+void OnDataRecv_Callback(const uint8_t * mac, const uint8_t *incomingData, int len) {
+  memcpy(&espMessageDataRx, incomingData, sizeof(espMessageDataRx));
+  Serial.print("Bytes received: ");
+  Serial.println(len);
+  Serial.print("Char: ");
+  Serial.println(espMessageDataRx.a);
+  Serial.print("Int: ");
+  Serial.println(espMessageDataRx.b);
+  Serial.print("Float: ");
+  Serial.println(espMessageDataRx.c);
+  Serial.print("Bool: ");
+  Serial.println(espMessageDataRx.d);
+  Serial.println();
 }

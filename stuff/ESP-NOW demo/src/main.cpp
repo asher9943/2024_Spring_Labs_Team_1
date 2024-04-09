@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "heltec_espnow.hpp"
 
+#define TRANSMITER
 
 void setup() {
   // stop right motor from running
@@ -17,10 +18,11 @@ void setup() {
 }
 
 void loop() {
-  strcpy(espMessageData.a, "HELLO");
-  espMessageData.b = 5;
-  espMessageData.c = 1.2;
-  espMessageData.d = false;
+  #ifdef TRANSMITTER
+  strcpy(espMessageDataTx.a, "HELLO");
+  espMessageDataTx.b = 5;
+  espMessageDataTx.c = 1.2;
+  espMessageDataTx.d = false;
 
   esp_err_t result = esp_now_send(donaldAddr, (uint8_t *) &espMessageData, sizeof(espMessageData));
    
@@ -31,4 +33,5 @@ void loop() {
     Serial.println("Error sending the data");
   }
   delay(2000);
+  #endif
 }
