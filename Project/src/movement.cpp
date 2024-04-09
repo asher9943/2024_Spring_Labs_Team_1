@@ -59,6 +59,8 @@ const unsigned int M1_ENC_B = 38;
 const unsigned int M2_ENC_A = 37;
 const unsigned int M2_ENC_B = 36;
 
+// Transition Variable
+int transition;
 
 
 /******************************************************************
@@ -416,7 +418,7 @@ void lineFollow(Encoder enc1) {
     intersection = intersectionDetect(enc1);
 
     if(!intersection) {
-      // new section
+      transition = 1;
     } else if(intersection >= 3) {
       // maze solving
     }
