@@ -41,18 +41,13 @@ int client_check();
  * Read data from client
  *
  * return
- *   0 - Client unavalible (No client/client disconneced)
- *   1 - Client connected, no data
- *   2 - Data avalible
+ *   0 - No data from client
+ *   1 - Data avalible
  */
 int client_read(String *client_rx_buff);
 
 /*
  * Write data to client
- *
- * return
- *   0 - Client unavalible (No client/client disconneced)
- *   1 - Data sent
  */
 int client_write(String client_tx_buff);
 
