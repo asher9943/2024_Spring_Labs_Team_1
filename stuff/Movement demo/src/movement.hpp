@@ -153,4 +153,18 @@ void updateMoveForwardPID(bool forward);
  */
 void updateLineFollow(Encoder enc1);
 
+/*  
+ *  Detect the type of intersection the mouse is at
+ * 
+ *  return
+ *    0 - New section
+ *    1 - Left turn
+ *    2 - Right turn
+ *    3 -  T  intersection
+ *    4 - -|  intersection
+ *    5 -  |- intersection
+ *    6 - -|- intersection
+ */
+int intersectionDetect(Encoder enc1);
+
 #endif
