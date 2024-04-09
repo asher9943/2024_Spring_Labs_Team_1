@@ -120,12 +120,10 @@ int client_check() {
  * Read data from client
  *
  * return
- *   0 - Client unavalible (No client/client disconneced)
- *   1 - Client connected, no data
- *   2 - Data avalible
+ *   0 - No data from client
+ *   1 - Data avalible
  */
 int client_read(String *client_rx_buff) {
-  if(client.connected()) {    // if the client is connected
     if(client.available()) {    // if there is data to be read
       // clear buffer
       *client_rx_buff = "";
@@ -133,40 +131,17 @@ int client_read(String *client_rx_buff) {
       // read data
       *client_rx_buff = client.readStringUntil('\n');
       client.flush();
-    
-      // process command
 
-      return 2;
+      return 1;
     }
-    return 1;
-
-  } else {
-    // client has disconnected
-    client.stop();
-    Serial.println("\nClient disconnected\n");
     return 0;
-  }
 }
+
 
 /*
  * Write data to client
- *
- * return
- *   0 - Client unavalible (No client/client disconneced)
- *   1 - Data sent
  */
 int client_write(String client_tx_buff) {
-  // if there is a client
-  if(client.connected()) {
-    client.println(client_tx_buff);
-    // client.println("");
-    client.flush();
-    return 1;
-  } else {
-
-    // client has disconnected
-    client.stop();
-    Serial.println("\nClient disconnected\n");
-    return 0;
-  }
+  client.println(client_tx_buff);
+  client.flush();
 }

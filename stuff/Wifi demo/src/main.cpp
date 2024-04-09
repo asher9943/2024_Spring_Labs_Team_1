@@ -25,15 +25,12 @@ void loop(){
 
   if(client_check()) {
     // if there is data to receive
-    if(client_read(&client_rx_buff) == 2) {
+    if(client_read(&client_rx_buff)) {
       Serial.print(" - Recieved: ");
       Serial.println(client_rx_buff);
 
       client_tx_buff = client_rx_buff;
-    }
 
-    // if data was recieved
-    if(client_tx_buff != "") {
       client_write(client_tx_buff);
 
       Serial.print(" - Sent:     ");
