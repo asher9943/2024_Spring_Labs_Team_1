@@ -386,6 +386,8 @@ void lineFollow(Encoder enc1) {
   float pid_val = 0;
   float Kp = 2.5;
   float Kd = 50;
+
+  uint8_t intersection = 0;
   
   // too long between updates, reset PID
   if((millis() - t_prev) >= 500) {
@@ -409,13 +411,15 @@ void lineFollow(Encoder enc1) {
   M2_forward(PWM_BASE - pid_val);
 
 
-  // check for corner
-  if((lineArray[0] == 1 || lineArray[12] == 1) && abs(error) <= 4) {
-    if((lineArray[0] == 1) && !(lineArray[12] == 1)) {
-      turnCorner(enc1, false);
-    } else if(!(lineArray[0] == 1) && (lineArray[12] == 1)) {
-      turnCorner(enc1, true);
-    }    
+  // check for corner/intersection/ new section
+  if((lineArray[0] == 1 || lineArray[12] == 1) && abs(prev_error) <= 4) {
+    intersection = intersectionDetect(enc1);
+
+    if(!intersection) {
+      // new section
+    } else if(intersection >= 3) {
+      // maze solving
+    }
   }
 
 
@@ -424,3 +428,57 @@ void lineFollow(Encoder enc1) {
   prev_error = error;
 }
 
+
+/*  
+ *  Detect the type of intersection the mouse is at
+ * 
+ *  return
+ *    0 - New section
+ *    1 - Left turn
+ *    2 - Right turn
+ *    3 -  T  intersection
+ *    4 - -|  intersection
+ *    5 -  |- intersection
+ *    6 - -|- intersection
+ */
+int intersectionDetect(Encoder enc1) {
+  // move slightly forward to make sure aligned
+  delay(10);
+  M1_stop();
+  M2_stop();
+
+  readLineSensor();
+
+  uint8_t right_prev = lineArray[0];
+  uint8_t left_prev = lineArray[12];
+  
+  // move forward again
+  moveForwardDist(enc1, 75);
+  delay(50);
+
+  readLineSensor();
+  
+  // determine intersection type
+  if((lineArray[0] == 1 || lineArray[12] == 1)) { // 0
+    return 0;                                       // new section
+
+  } else if(lineArray[6] == 0) {                  // 1,2,3
+    if(left_prev == 1 && right_prev == 1) {         // T intersection
+      return 3;
+    } else if(right_prev == 1) {                    // right turn
+      turnAngle(-90);
+      return 2;
+    } else {                                        // left turn
+      turnAngle(90);
+      return 1;
+    }
+  } else {                                        // 4,5,6
+    if(left_prev == 1 && right_prev == 1) {         // -|- intersection
+      return 6;
+    } else if(right_prev == 1) {                    //  |- intersection
+      return 5;
+    } else {                                        // -|  intersection
+      return 4;
+    }
+  }
+}
