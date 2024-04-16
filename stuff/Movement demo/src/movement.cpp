@@ -1,5 +1,21 @@
 #include "movement.hpp"
 
+// #define USER_DONALD
+#define USER_ASHER
+// #define USER_STEPHEN
+
+#ifdef USER_DONALD
+  #define MPU_YAW_DRIFT -0.005    // Drift correction for turning
+  #define MPU_ANG_FIX 1.1         // Turn angle correction
+#elif defined(USER_ASHER)
+  #define MPU_YAW_DRIFT 0         // Drift correction for turning
+  #define MPU_ANG_FIX 1.0         // Turn angle correction
+#else
+  #define MPU_YAW_DRIFT 0         // Drift correction for turning
+  #define MPU_ANG_FIX 1.0         // Turn angle correction
+#endif
+
+
 
 /******************************************************************
  *                          Variables
@@ -47,9 +63,6 @@ float pos_prev = LINE_MID;
 
 
 // MPU
-#define MPU_YAW_DRIFT -0.005    // Drift correction for turning
-#define MPU_ANG_FIX 1.1         // Turn angle correction
-
 Adafruit_MPU6050 mpu;
 
 
