@@ -5,6 +5,7 @@
 
 #include "movement.hpp"
 #include "transition.hpp"
+#include "asteroidfield.hpp"
 
 int state;
 
@@ -57,7 +58,11 @@ void loop() {
   } else if(state == 3) { // Hoth Asteroid Field
     transition = 0;
     do {
-
+      lineFollow(enc1);
+      delay(50);
+      // if() {
+      //   move_around();
+      // }
     } while(transition == 0);
     
     transition_left();
