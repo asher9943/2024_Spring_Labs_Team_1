@@ -30,7 +30,6 @@ void loop() {
 
   if(state == 0) { // Line of the Republic
     transition = 0;
-
     do {
       lineFollow(enc1);
       delay(50);
