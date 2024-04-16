@@ -5,21 +5,39 @@ import wave
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
-RATE = 44100
-CHUNK = 1024
+RATE = 48000
+CHUNK = 512
 RECORD_SECONDS = 5
 
 audio = pyaudio.PyAudio()
 
+# programatically get the left/right indexes, assumes left was plugged in first
+indexes = []
+
+info = audio.get_host_api_info_by_index(0)
+numdevices = info.get("deviceCount")
+
+for i in range(0, numdevices):
+    if (
+        audio.get_device_info_by_host_api_device_index(0, i).get("maxInputChannels")
+    ) > 0 and "USB Composite Device: Audio" in audio.get_device_info_by_host_api_device_index(
+        0, i
+    ).get(
+        "name"
+    ):
+        indexes.append(i)
+
+if len(indexes) != 2:
+    raise SystemExit("Incorrect number of microphones, I exit")
+
 # start recording
-# NEED TO TEST ON XAVIER SO LEFT/RIGHT INDEXES ARE CONSISTENT
 left_stream = audio.open(
     format=FORMAT,
     channels=CHANNELS,
     rate=RATE,
     input=True,
     frames_per_buffer=CHUNK,
-    input_device_index=0,
+    input_device_index=indexes[0],
 )
 
 right_stream = audio.open(
@@ -28,15 +46,16 @@ right_stream = audio.open(
     rate=RATE,
     input=True,
     frames_per_buffer=CHUNK,
-    input_device_index=1,
+    input_device_index=indexes[1],
 )
 
 left_frames = []
 right_frames = []
 
 for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-    left_data = left_stream.read(CHUNK)
-    right_data = right_stream.read(CHUNK)
+    # It overflows, hopefully just ignoring it is fine
+    left_data = left_stream.read(CHUNK, exception_on_overflow=False)
+    right_data = right_stream.read(CHUNK, exception_on_overflow=False)
     left_frames.append(left_data)
     right_frames.append(right_data)
 
