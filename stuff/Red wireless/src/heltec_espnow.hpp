@@ -17,10 +17,9 @@ extern const uint8_t broadcastAddr_S[];
 
 // messaging structure
 typedef struct esp_message {
-  char a[32];
-  int b;
-  float c;
-  bool d;
+  bool obsticle;
+  bool dualFates_ready;
+  bool dualFates_val;
 } esp_message;
 
 // esp-now message buffers
@@ -46,7 +45,7 @@ void OnDataSent_Callback(const uint8_t *mac_addr, esp_now_send_status_t status);
 
 /*
  * Data recieve callback
- */
+ */// turn left
 void OnDataRecv_Callback(const uint8_t *mac, const uint8_t *incomingData, int len);
 
 #endif

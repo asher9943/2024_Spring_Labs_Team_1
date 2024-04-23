@@ -1,4 +1,5 @@
 #include "heltec_wifi.hpp"
+#include "heltec_espnow.hpp"
 
 
 /******************************************************************
@@ -11,6 +12,8 @@ const char *password = "czkm443@";
 
 const char *serverName = "198.162.46.240";
 const int serverPort = 80;
+
+String client_rx_buff = "";
 
 // Set web server port number to 80
 WiFiServer server(serverPort);
@@ -140,7 +143,48 @@ int client_read(String *client_rx_buff) {
 /*
  * Write data to client
  */
-int client_write(String client_tx_buff) {
+void client_write(String client_tx_buff) {
   client.println(client_tx_buff);
   client.flush();
+}
+
+
+void handle_wifi() {
+  client_read(&client_rx_buff);
+
+  switch(client_rx_buff[1]) {
+    case 'm':
+      espMessageDataTx.obsticle = 1;
+      break;
+    case 'd':
+      espMessageDataTx.dualFates_ready = 1;
+      if(client_rx_buff[2] == 'l') {
+        espMessageDataTx.dualFates_val = 0;
+      } else if(client_rx_buff[2] == 'r') {
+        espMessageDataTx.dualFates_val = 1;
+      } else {
+        //error
+      }
+      break;
+    default:
+      //error
+      break;
+  }
+
+  switch(client_rx_buff[0]) {
+    case 'r':
+      // handle dual fates
+      break;
+    case 'g':
+      esp_now_send(broadcastAddr_A, (uint8_t *) &espMessageDataTx, sizeof(espMessageDataTx));
+      break;
+    case 'b':
+      esp_now_send(broadcastAddr_S, (uint8_t *) &espMessageDataTx, sizeof(espMessageDataTx));
+      break;
+    default:
+      //error
+      break;
+  } 
+  espMessageDataTx.obsticle = 0;
+  espMessageDataTx.dualFates_ready = 0;
 }

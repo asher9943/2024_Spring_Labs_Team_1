@@ -2,7 +2,6 @@
 
 #include "heltec_wifi.hpp"
 
-
 void setup() {
   // stop right motor from running
   pinMode(14, OUTPUT);

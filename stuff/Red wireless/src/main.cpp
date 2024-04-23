@@ -2,7 +2,7 @@
 #include "heltec_wifi.hpp"
 #include "heltec_espnow.hpp"
 
-// #define TRANSMITER
+
 
 void setup() {
   // stop right motor from running
