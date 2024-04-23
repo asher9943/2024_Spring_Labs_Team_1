@@ -21,10 +21,10 @@ void loop() {
   #ifdef TRANSMITER
   strcpy(espMessageDataTx.a, "HELLO");
   espMessageDataTx.b = 5;
-  espMessageDataTx.c = 1.2;espMessageData
+  espMessageDataTx.c = 1.2;
   espMessageDataTx.d = false;
 
-  esp_err_t result = esp_now_send(broadcastAddr, (uint8_t *) &espMessageDataTx, sizeof(espMessageDataTx));
+  esp_err_t result = esp_now_send(broadcastAddr_D, (uint8_t *) &espMessageDataTx, sizeof(espMessageDataTx));
    
   if (result == ESP_OK) {
     Serial.println("Sent with success");
