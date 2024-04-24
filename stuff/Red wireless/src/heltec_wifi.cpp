@@ -1,6 +1,8 @@
 #include "heltec_wifi.hpp"
 #include "heltec_espnow.hpp"
 
+// #define TERM
+
 
 /******************************************************************
  *                          Variables
@@ -38,21 +40,29 @@ WiFiClient client;
  * Wifi initialization, put in setup()
  */
 void wifi_Init() {
+  #ifdef TERM
   Serial.print("Connecting to ");
   Serial.print(ssid);
+  #endif
+  
 
   // Connect to Wi-Fi network with SSID and password
   WiFi.begin(ssid, password);
   while(WiFi.status() != WL_CONNECTED) {
     delay(500);
+    #ifdef TERM
     Serial.print(".");
+    #endif
   }
 
   // Print local IP address
+  #ifdef TERM
   Serial.println("\n\nWiFi connected");
   Serial.print  ("IP address:  ");
   Serial.println(WiFi.localIP());
   Serial.println("");
+  #endif
+
 }
 
 
@@ -62,9 +72,11 @@ void wifi_Init() {
 void server_Init() {
   server.begin();
 
+  #ifdef TERM
   Serial.print  ("Server created, listening to port ");
   Serial.println(serverPort);
   Serial.println("");
+  #endif
 }
 
 
@@ -72,17 +84,24 @@ void server_Init() {
  * Connect to server, put in setup()
  */
 void client_Init() {
+  #ifdef TERM
   Serial.print("Connecting to ");
   Serial.print(serverName);
   Serial.print(" at port ");
   Serial.print(serverPort);
+  #endif
+  
 
   while(!client.connect(serverName, serverPort)) {
       delay(500);
+      #ifdef TERM
       Serial.print(".");
+      #endif
   }
 
+  #ifdef TERM
   Serial.println("\nConnected");
+  #endif
 }
 
 
@@ -104,15 +123,19 @@ int client_check() {
   if(!client) {
     client = server.available();    // Listen for incoming clients
     if(!client) return 0;           // return 0 if no clients
-    
+    #ifdef TERM
     Serial.println("New client");
+    #endif
+    
   }
 
   if(client.connected()) {    // The client is connected
     return 1;
   } else {                    // The client has disconnected
     client.stop();
+    #ifdef TERM
     Serial.println("\nClient disconnected\n");
+    #endif
     return 0;
   }
 }
@@ -154,10 +177,10 @@ void handle_wifi() {
 
   switch(client_rx_buff[1]) {
     case 'm':
-      espMessageDataTx.obsticle = 1;
+      espMessageDataTx.maze_obsticle = 1;
       break;
     case 'd':
-      espMessageDataTx.dualFates_ready = 1;
+      espMessageDataTx.dualFates_rdy = 1;
       if(client_rx_buff[2] == 'l') {
         espMessageDataTx.dualFates_val = 0;
       } else if(client_rx_buff[2] == 'r') {
@@ -185,6 +208,6 @@ void handle_wifi() {
       //error
       break;
   } 
-  espMessageDataTx.obsticle = 0;
-  espMessageDataTx.dualFates_ready = 0;
+  espMessageDataTx.maze_obsticle = 0;
+  espMessageDataTx.dualFates_rdy = 0;
 }

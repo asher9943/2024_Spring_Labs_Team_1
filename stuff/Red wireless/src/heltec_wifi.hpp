@@ -22,7 +22,7 @@ extern WiFiClient client;
  ******************************************************************
  */
 
-// Wifi and server initialization
+// Wifi and server initialization, put in setup() after esp-now init
 void wifi_Init();
 void server_Init();
 void client_Init();
@@ -49,7 +49,7 @@ int client_read(String *client_rx_buff);
 /*
  * Write data to client
  */
-int client_write(String client_tx_buff);
+void client_write(String client_tx_buff);
 
 
 
