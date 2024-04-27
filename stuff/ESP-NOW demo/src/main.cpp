@@ -19,12 +19,13 @@ void setup() {
 
 void loop() {
   #ifdef TRANSMITER
-  strcpy(espMessageDataTx.a, "HELLO");
-  espMessageDataTx.b = 5;
-  espMessageDataTx.c = 1.2;
-  espMessageDataTx.d = false;
+  espMessageDataTx.maze_obsticle = 0;
+  espMessageDataTx.dualFates_ready = 0;
+  espMessageDataTx.dualFates_val = 0;
+  espMessageDataTx.start = 0;
+  espMessageDataTx.rescue = 0;
 
-  esp_err_t result = esp_now_send(broadcastAddr_D, (uint8_t *) &espMessageDataTx, sizeof(espMessageDataTx));
+  esp_err_t result = esp_now_send(broadcaseAdd, (uint8_t *) &espMessageDataTx, sizeof(espMessageDataTx));
    
   if (result == ESP_OK) {
     Serial.println("Sent with success");

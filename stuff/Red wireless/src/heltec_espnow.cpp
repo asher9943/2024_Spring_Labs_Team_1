@@ -1,9 +1,8 @@
 #include "heltec_espnow.hpp"
 
+// #define TERM
 
-#define USER_DONALD
-// #define USER_ASHER
-// #define USER_STEPHEN
+#define ROBOT_RED
 
 
 /******************************************************************
@@ -35,7 +34,9 @@ void heltec_espnow_Init(void) {
   WiFi.mode(WIFI_STA);
 
   if (esp_now_init() != ESP_OK) {
+    #ifdef TERM
     Serial.println("Error initializing ESP-NOW");
+    #endif
     return;
   }
 
@@ -44,33 +45,40 @@ void heltec_espnow_Init(void) {
   esp_now_register_recv_cb(OnDataRecv_Callback);
 
 
-  #ifndef USER_DONALD
-    memcpy(peerInfo.peer_addr, broadcastAddr_D, 6);
+  #ifndef ROBOT_RED
+    memcpy(peerInfo.peer_addr, RED_ADDR, 6);
     peerInfo.channel = 0;  
     peerInfo.encrypt = false;
 
     if (esp_now_add_peer(&peerInfo) != ESP_OK){
-      Serial.println("Failed to add peer");
+      
+      #ifdef TERM
+        Serial.println("Failed to add peer");
+      #endif
       return;
     }
   #endif
-  #ifndef USER_ASHER
-    memcpy(peerInfo.peer_addr, broadcastAddr_A, 6);
+  #ifndef ROBOT_GRN
+    memcpy(peerInfo.peer_addr, GRN_ADDR, 6);
     peerInfo.channel = 0;  
     peerInfo.encrypt = false;
 
     if (esp_now_add_peer(&peerInfo) != ESP_OK){
-      Serial.println("Failed to add peer");
+      #ifdef TERM
+        Serial.println("Failed to add peer");
+      #endif
       return;
     }
   #endif
-  #ifndef USER_STEPHEN
-    memcpy(peerInfo.peer_addr, broadcastAddr_S, 6);
+  #ifndef ROBOT_BLU
+    memcpy(peerInfo.peer_addr, BLU_ADDR, 6);
     peerInfo.channel = 0;  
     peerInfo.encrypt = false;
 
     if (esp_now_add_peer(&peerInfo) != ESP_OK){
-      Serial.println("Failed to add peer");
+      #ifdef TERM
+        Serial.println("Failed to add peer");
+      #endif
       return;
     }
   #endif
@@ -78,22 +86,43 @@ void heltec_espnow_Init(void) {
 
 // data sent callback
 void OnDataSent_Callback(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  Serial.print("\r\nLast Packet Send Status:\t");
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+  #ifdef TERM
+    Serial.print("\r\nLast Packet Send Status:\t");
+    Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+  #endif
 }
 
 // data recieve callback
 void OnDataRecv_Callback(const uint8_t * mac, const uint8_t *incomingData, int len) {
   memcpy(&espMessageDataRx, incomingData, sizeof(espMessageDataRx));
-  Serial.print("Bytes received: ");
-  Serial.println(len);
-  Serial.print("Char: ");
-  Serial.println(espMessageDataRx.a);
-  Serial.print("Int: ");
-  Serial.println(espMessageDataRx.b);
-  Serial.print("Float: ");
-  Serial.println(espMessageDataRx.c);
-  Serial.print("Bool: ");
-  Serial.println(espMessageDataRx.d);
-  Serial.println();
+
+  #ifdef TERM
+    Serial.print("Bytes received: ");
+    Serial.println(len);
+    Serial.print("Maze obsticle: ");
+    Serial.println(espMessageDataRx.maze_obsticle);
+    Serial.print("Dual Fates, ready: ");
+    Serial.println(espMessageDataRx.dualFates_rdy);
+    Serial.print("Dual Fates, value: ");
+    Serial.println(espMessageDataRx.dualFates_val);
+    Serial.print("Start robot: ");
+    Serial.println(espMessageDataRx.start);
+    Serial.print("Rescue: ");
+    Serial.println(espMessageDataRx.rescue);
+    Serial.println();
+  #endif
+
+  if(espMessageDataRx.maze_obsticle) {
+    // avoid maze obsticle
+  } else if(espMessageDataRx.dualFates_rdy) {
+    if(espMessageDataRx.dualFates_val) {
+      // turn right
+    } else {
+      // turn left
+    }
+  } else if(espMessageDataRx.start) {
+    // start moving
+  } else if(espMessageDataRx.rescue) {
+    // rescue red robot
+  }
 }

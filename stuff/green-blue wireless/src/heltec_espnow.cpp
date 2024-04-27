@@ -2,7 +2,6 @@
 
 // #define TERM
 
-#define ROBOT_RED
 // #define ROBOT_GRN
 // #define ROBOT_BLU
 
