@@ -1,5 +1,21 @@
 #include "movement.hpp"
 
+// #define USER_DONALD
+#define USER_ASHER
+// #define USER_STEPHEN
+
+#ifdef USER_DONALD
+  #define MPU_YAW_DRIFT -0.005    // Drift correction for turning
+  #define MPU_ANG_FIX 1.1         // Turn angle correction
+#elif defined(USER_ASHER)
+  #define MPU_YAW_DRIFT 0         // Drift correction for turning
+  #define MPU_ANG_FIX 1.0         // Turn angle correction
+#else
+  #define MPU_YAW_DRIFT 0         // Drift correction for turning
+  #define MPU_ANG_FIX 1.0         // Turn angle correction
+#endif
+
+
 
 /******************************************************************
  *                          Variables
@@ -47,9 +63,6 @@ float pos_prev = LINE_MID;
 
 
 // MPU
-#define MPU_YAW_DRIFT -0.005    // Drift correction for turning
-#define MPU_ANG_FIX 1.1         // Turn angle correction
-
 Adafruit_MPU6050 mpu;
 
 
@@ -378,7 +391,7 @@ void updateMoveForwardPID(bool forward) {
  *  Follows a line, function updates the lineFollow PID
  *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
  */
-void lineFollow(Encoder enc1) {
+void updateLineFollow(Encoder enc1) {
   static float t_prev = millis();
   float pos;
 
