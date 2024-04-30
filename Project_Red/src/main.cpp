@@ -5,6 +5,8 @@
 
 #include "movement.hpp"
 #include "transition.hpp"
+#include "heltec_espnow.hpp"
+#include "heltec_wifi.hpp"
 
 int state;
 
@@ -12,6 +14,8 @@ void setup() {
   Serial.begin(115200);
 
   movement_Init();
+  heltec_espnow_Init();
+  wifi_Init();
 
   M1_stop();
   M2_stop();
