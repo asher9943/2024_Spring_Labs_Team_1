@@ -35,8 +35,10 @@ extern const unsigned int M1_ENC_B;
 extern const unsigned int M2_ENC_A;
 extern const unsigned int M2_ENC_B;
 
+
 // Transition Variable
 extern int transition;
+
 
 /* To use the encoders:
 

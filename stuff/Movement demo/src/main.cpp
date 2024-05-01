@@ -25,7 +25,38 @@ void loop() {
   delay(2000);
 
   while(true) {
-    
+
+    /*           IMU Calibration          */
+    // set MPU_YAW_DRIFT equal to the average
+    // sensors_event_t a, g, temp;
+    // mpu.getEvent(&a, &g, &temp);
+    // Serial.println(g.gyro.z);
+
+
+    /*         Turning Calibration        */
+    // set MPU_ANG_FIX so that the turns are perfect
+    // test both -90 and 90
+    // MPU_ANG_FIX is scaling, so it should be 0.7-1.3 at most
+    // turnAngle(-90);
+
+
+    /*         Encoder Calibration        */
+    // set ENC_FIX_FRWD and ENC_FIX_BKWD so it goes mostly straight
+    // change ENC_FIX_FRWD for forward movement (1000)
+    // change ENC_FIX_BKWD for backward movement (-1000)
+    // positive values increases power of left motor (turns more right)
+    // moveForwardDist(enc1, 1000);
+
+
+
+    /*         Line Sensor Debug        */
+    // for(int i = 0; i < 13; i++) {
+    //   Serial.print(lineArray[i]); Serial.print(" ");
+    // }
+    // Serial.println(" ");
+
+
+
     /*            Turning Demo            */
 
     // turnCorner(enc1, true);     delay(750);
@@ -55,8 +86,8 @@ void loop() {
 
     /*           Line Follow Demo           */
 
-    // lineFollow(enc1);
-    // delay(50);
+    // updateLineFollow(enc1);
+    // delay(10);
 
   }
 }

@@ -27,18 +27,18 @@ void loop() {
   Encoder enc2(M2_ENC_A, M2_ENC_B);
  
   delay(2000);
-
+moveForwardDist(enc1, 100);
   // TODO wait for go from computer
 
   if(state == 0) { // Line of the Republic ---------------------------
     transition = 0;
 
     do {
-      updateLineFollow(enc1);
-      delay(50);
+      updateLineFollow(enc2);
+      delay(10);
     } while(transition == 0);
-    
-    transition_right();
+    Serial.print("[main]");
+    transition_right(enc1);
     state = 1;
     // tell next robot to go?
 
@@ -49,18 +49,23 @@ void loop() {
     // find maze entrance
     do {
       updateLineFollow(enc1);
-      delay(50);
-    } while(lineArray[12] == 0);
+      delay(10);
+      readLineSensor();
+    } while(lineArray[0] == 0);
     
+    delay(50);
+    moveForwardDist(enc1, -50);
+    delay(50);
+
     // skip maze
-    turnAngle(-90);
+    turnAngle(-105);
 
     int count = 0;
     do {
       updateMoveForwardPID(1);
-      delay(50);
+      delay(10);
       count++;
-    } while(count <= 60); //TODO test
+    } while(count <= 250); //TODO test
 
     turnAngle(90);
 
@@ -75,10 +80,10 @@ void loop() {
     // finish section
     do {
       updateLineFollow(enc1);
-      delay(50);
+      delay(10);
     } while(transition == 0);
 
-    transition_left();
+    transition_left(enc1);
     state = 2;
 
 
@@ -87,10 +92,10 @@ void loop() {
 
     do {
       updateLineFollow(enc1); //TODO wifi check
-      delay(50);
+      delay(10);
     } while(transition == 0);
     
-    transition_left();
+    transition_left(enc1);
     state = 3;
 
 
@@ -99,16 +104,16 @@ void loop() {
 
     // get parallel to line
     turnAngle(90);
-    moveForwardDist(enc1, 10);
+    moveForwardDist(enc1, 50);
     turnAngle(-90);
 
     // skip asteroid field
     int count = 0;
     do {
       updateMoveForwardPID(1); //TODO wifi check
-      delay(50);
+      delay(10);
       count++;
-    } while(count <= 100); //TODO test
+    } while(count <= 200); //TODO test
     
     // find line again
     turnAngle(-90);
@@ -123,10 +128,10 @@ void loop() {
     // finish section
     do {
       updateLineFollow(enc1); //TODO wifi check
-      delay(50);
+      delay(10);
     } while(transition == 0);
 
-    transition_left();
+    transition_left(enc1);
     state = 4;
 
 
@@ -135,7 +140,7 @@ void loop() {
 
     do {
       updateLineFollow(enc1); //TODO wifi check
-      delay(50);
+      delay(10);
     } while(!(lineArray[0] == 1 && lineArray[12] == 1));
     
     // tell computer to listen
@@ -149,7 +154,7 @@ void loop() {
 
       do {
         updateLineFollow(enc1); //TODO wifi check
-        delay(50);
+        delay(10);
       } while(lineArray[12] == 0);
 
       turnCorner(enc1, 1);
@@ -159,7 +164,7 @@ void loop() {
 
       do {
         updateLineFollow(enc1); //TODO wifi check
-        delay(50);
+        delay(10);
       } while(lineArray[0] == 0);
 
       turnCorner(enc1, 0);
@@ -169,10 +174,10 @@ void loop() {
     // follow line to end
     do {
       updateLineFollow(enc1); //TODO wifi check
-      delay(50);
+      delay(10);
     } while(transition == 0);
 
-    transition_left();
+    transition_left(enc1);
     state = 5;
 
 
@@ -181,10 +186,10 @@ void loop() {
 
     do {
       updateLineFollow(enc1); //TODO wifi check
-      delay(50);
+      delay(10);
     } while(transition == 0);
     
-    transition_left();
+    transition_left(enc1);
     state = 6;
 
 
@@ -193,13 +198,13 @@ void loop() {
 
     do {
       updateLineFollow(enc1); //TODO wifi check
-      delay(50);
+      delay(10);
       readLineSensor();
     } while(lineArray[6] == 1);
     
     do {
       updateMoveForwardPID(1); //TODO wifi check
-      delay(50);
+      delay(10);
       readLineSensor();
     } while(lineArray[6] == 0);
 
