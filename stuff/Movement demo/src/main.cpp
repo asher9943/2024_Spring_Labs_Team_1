@@ -37,7 +37,8 @@ void loop() {
     // set MPU_ANG_FIX so that the turns are perfect
     // test both -90 and 90
     // MPU_ANG_FIX is scaling, so it should be 0.7-1.3 at most
-    // turnAngle(-90);
+    // turnAngle(90);
+    // delay(500);
 
 
     /*         Encoder Calibration        */
@@ -45,7 +46,7 @@ void loop() {
     // change ENC_FIX_FRWD for forward movement (1000)
     // change ENC_FIX_BKWD for backward movement (-1000)
     // positive values increases power of left motor (turns more right)
-    // moveForwardDist(enc1, 1000);
+    // moveForwardDist(enc1, -1000);
 
 
 
@@ -69,24 +70,14 @@ void loop() {
 
 
     /*       Straignt line PID Demo       */
-
-    // for(int i = 0; i < 1000; i++) {
-    //   updateMoveForwardPID(true);
-    // }
-    // M1_stop();
-    // M2_stop();
-    // delay(1000);
-    // for(int i = 0; i < 1000; i++) {
-    //   updateMoveForwardPID(false); 
-    // }
-    // M1_stop();
-    // M2_stop();
-    // delay(1000);
+    
+    // updateMoveForwardPID(true);
+    // delay(10);
 
 
     /*           Line Follow Demo           */
 
-    // updateLineFollow(enc1);
+    // updateLineFollow(0);
     // delay(10);
 
   }
