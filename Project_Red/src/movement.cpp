@@ -1,19 +1,26 @@
 #include "movement.hpp"
 
-// #define USER_DONALD
-#define USER_ASHER
+#define USER_DONALD
+// #define USER_ASHER
 // #define USER_STEPHEN
 
 #ifdef USER_DONALD
-  #define MPU_YAW_DRIFT -0.005    // Drift correction for turning
-  #define MPU_ANG_FIX 1.1         // Turn angle correction
+  #define MPU_YAW_DRIFT 0.01     // Drift correction for turning
+  #define MPU_ANG_FIX 1.2         // Turn angle correction
+  #define ENC_FIX_FRWD -5         // Forward movement encoder correction
+  #define ENC_FIX_BKWD -5       // Backward movement encoder correction
 #elif defined(USER_ASHER)
-  #define MPU_YAW_DRIFT 0         // Drift correction for turning
-  #define MPU_ANG_FIX 1.0         // Turn angle correction
+  #define MPU_YAW_DRIFT 0.005         // Drift correction for turning
+  #define MPU_ANG_FIX 1.22         // Turn angle correction
+  #define ENC_FIX_FRWD 0          // Forward movement encoder correction
+  #define ENC_FIX_BKWD 0          // Backward movement encoder correction
 #else
   #define MPU_YAW_DRIFT 0         // Drift correction for turning
   #define MPU_ANG_FIX 1.0         // Turn angle correction
+  #define ENC_FIX_FRWD 0          // Forward movement encoder correction
+  #define ENC_FIX_BKWD 0          // Backward movement encoder correction
 #endif
+
 
 
 
@@ -58,7 +65,7 @@ int adc2_buf[8];
 
 uint8_t lineArray[13];
 
-const float LINE_MID = 6;
+const float LINE_MID = 5;
 float pos_prev = LINE_MID;
 
 
@@ -71,6 +78,7 @@ const unsigned int M1_ENC_A = 39;
 const unsigned int M1_ENC_B = 38;
 const unsigned int M2_ENC_A = 37;
 const unsigned int M2_ENC_B = 36;
+
 
 // Transition Variable
 int transition;
@@ -165,24 +173,19 @@ void readLineSensor() {
   
   // Digital conversion
   for (int i = 0; i < 7; i++) {
-    if (adc1_buf[i]>690) {
+    if (adc1_buf[i]>640) {
       lineArray[2*i] = 0;
     } else {
       lineArray[2*i] = 1;
     }
 
     if (i<6) {
-      if (adc2_buf[i]>690){
+      if (adc2_buf[i]>640){
         lineArray[2*i+1] = 0;
       } else {
         lineArray[2*i+1] = 1;
       }
     }
-
-    // Print line sensor data
-    // for(int i = 0; i < 13; i++) {
-    //   Serial.print(lineArray[2*i+1]); Serial.print(" ");
-    // }
   }
 }
 
@@ -262,31 +265,40 @@ void updateAngle(float *curr_angle, float *g_prev, unsigned long *t_prev) {
  *      goal_mm > 0 - Move forward
  *      goal_mm < 0 - Move backward
  */
-void moveForwardDist(Encoder enc1, float goal_mm) {
-  const float f_corr = -2.5;
-  const float b_corr = 1.5;
-  
-  long goal_tick = 3.581*goal_mm;
-  
-  long enc_value = enc1.read();
-  long enc_base = enc_value;
-  
-  
-  // move motors
-  if(goal_tick > 0) {
-    M1_forward(PWM_BASE + f_corr);
-    M2_forward(PWM_BASE - f_corr);
-  } else {
-    M1_backward(PWM_BASE - b_corr);
-    M2_backward(PWM_BASE + b_corr);
-  }
+// void moveForwardDist(Encoder enc1, float goal_mm) {
+void moveForwardDist(bool forward, float goal_ms) {
+  int t_start = millis();
+  int t_tot = t_start;
 
-  // Poll until encoder goal is reached
-  while(abs(enc_value-enc_base) < abs(goal_tick)) enc_value = enc1.read();
   
-  // stop motors
+  do {
+    updateMoveForwardPID(forward);
+    delay(10);
+    t_tot = millis() - t_start;
+  } while(t_tot < goal_ms); //TODO test
   M1_stop();
   M2_stop();
+  // long goal_tick = 3.581*goal_mm;
+
+  // long enc_value = enc1.read();
+  // long enc_base = enc_value;
+  
+
+  // // move motors
+  // if(goal_tick > 0) {
+  //   M1_forward(PWM_BASE + ENC_FIX_FRWD);
+  //   M2_forward(PWM_BASE - ENC_FIX_FRWD);
+  // } else {
+  //   M1_backward(PWM_BASE + ENC_FIX_BKWD);
+  //   M2_backward(PWM_BASE - ENC_FIX_BKWD);
+  // }
+
+  // // Poll until encoder goal is reached
+  // while(abs(enc_value-enc_base) < abs(goal_tick)) enc_value = enc1.read();
+
+  // // stop motors
+  // M1_stop();
+  // M2_stop();
 }
 
 
@@ -321,13 +333,14 @@ void turnAngle(float goal) {
 /*
  *  Turns a corner using encoders and the IMU
  *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
- *    ccw  - If true, turns the mouse counter clock-wise
+ *    ccw  - If true, turns the mouse left
  */
 void turnCorner(Encoder enc1, bool ccw) {
   // move forward until axis is aligned
-  moveForwardDist(enc1, 75);
+  // moveForwardDist(enc1, 75);
+moveForwardDist(true, 250); //TODO test
 
-  delay(50);
+  delay(100);
 
   // turn 90 degrees
   if(ccw) {
@@ -337,6 +350,27 @@ void turnCorner(Encoder enc1, bool ccw) {
   }
 }
 
+/*
+ *  Aligns the mouse on a white line
+ *    ccw  - If true, mouse turns ccw
+ */
+void align(bool ccw) {
+  if (ccw) {
+    M1_backward(PWM_BASE);
+    M2_forward(PWM_BASE);
+  } else {
+    M1_forward(PWM_BASE);
+    M2_backward(PWM_BASE);
+  }
+
+  while(lineArray[6] != 1); {
+    delay(100);
+    readLineSensor();
+  } 
+
+  M1_stop();
+  M2_stop();
+}
 
 /*
  *  Moves the mouse forward (or backward) using IMU for PID
@@ -348,7 +382,7 @@ void updateMoveForwardPID(bool forward) {
 
   float pid_val = 0;
   float Kp = 2.5;
-  float Kd = 50;
+  float Kd = 30;
   float Ki = 0.015;
 
   static float error = 0;
@@ -357,7 +391,7 @@ void updateMoveForwardPID(bool forward) {
 
 
   // too long between updates, reset PID
-  if((millis() - t_prev) >= 500) {
+  if((millis() - t_prev) >= 100) {
     g_prev = 0;
     t_prev = millis(); 
 
@@ -385,29 +419,30 @@ void updateMoveForwardPID(bool forward) {
   }
 }
 
-
-
 /*
  *  Follows a line, function updates the lineFollow PID
  *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
  */
-void updateLineFollow(Encoder enc1) {
+void updateLineFollow(int boost) {
   static float t_prev = millis();
   float pos;
 
   static float error = 0;
   static float prev_error = 0;
+  // static float total_error = 0;
 
   float pid_val = 0;
-  float Kp = 2.5;
-  float Kd = 50;
+  float Kp = 5;
+  float Kd = 40;
+  // float Ki = 0.015;
 
   uint8_t intersection = 0;
   
   // too long between updates, reset PID
-  if((millis() - t_prev) >= 500) {
+  if((millis() - t_prev) >= 100) {
     error = 0;
     prev_error = 0;
+    //total_error = 0;
   }
   t_prev = millis(); 
 
@@ -417,13 +452,63 @@ void updateLineFollow(Encoder enc1) {
 
   pos = getLinePosition();
   error = pos - LINE_MID;
+  // total_error += error;
 
   pid_val = Kp*error + Kd*(error-prev_error);
+  // pid_val = Kp*error + Kd*(error-prev_error) + Ki*total_error;
 
 
   // apply PID
-  M1_forward(PWM_BASE + pid_val);
-  M2_forward(PWM_BASE - pid_val);
+  M1_forward(PWM_BASE + boost - pid_val);
+  M2_forward(PWM_BASE + boost + pid_val);
+
+  // update "previous" values
+  pos_prev = pos;
+  prev_error = error;
+}
+
+/*
+ *  Follows a line, function updates the lineFollow PID
+ *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
+ */
+void updateLineFollowInter(Encoder enc1) {
+  static float t_prev = millis();
+  float pos;
+
+  static float error = 0;
+  static float prev_error = 0;
+  // static float total_error = 0;
+
+  float pid_val = 0;
+  float Kp = 5;
+  float Kd = 25;
+  // float Ki = 0.015;
+
+  uint8_t intersection = 0;
+  
+  // too long between updates, reset PID
+  if((millis() - t_prev) >= 100) {
+    error = 0;
+    prev_error = 0;
+    //total_error = 0;
+  }
+  t_prev = millis(); 
+
+
+  // update PID
+  readLineSensor();
+
+  pos = getLinePosition();
+  error = pos - LINE_MID;
+  // total_error += error;
+
+  pid_val = Kp*error + Kd*(error-prev_error);
+  // pid_val = Kp*error + Kd*(error-prev_error) + Ki*total_error;
+
+
+  // apply PID
+  M1_forward(PWM_BASE - pid_val);
+  M2_forward(PWM_BASE + pid_val);
 
 
   // check for corner/intersection/ new section
@@ -459,6 +544,7 @@ void updateLineFollow(Encoder enc1) {
 int intersectionDetect(Encoder enc1) {
   // move slightly forward to make sure aligned
   delay(10);
+
   M1_stop();
   M2_stop();
 
@@ -466,13 +552,14 @@ int intersectionDetect(Encoder enc1) {
 
   uint8_t right_prev = lineArray[0];
   uint8_t left_prev = lineArray[12];
-  
+
   // move forward again
-  moveForwardDist(enc1, 75);
+  // moveForwardDist(enc1, 75);
+  moveForwardDist(true, 250); //TODO TEST
   delay(50);
 
   readLineSensor();
-  
+
   // determine intersection type
   if((lineArray[0] == 1 && lineArray[12] == 1)) { // 0
     return 0;                                       // new section
@@ -481,10 +568,10 @@ int intersectionDetect(Encoder enc1) {
     if(left_prev == 1 && right_prev == 1) {         // T intersection
       return 3;
     } else if(right_prev == 1) {                    // right turn
-      turnAngle(-90);
+      turnAngle(90);
       return 2;
     } else {                                        // left turn
-      turnAngle(90);
+      turnAngle(-90);
       return 1;
     }
   } else {                                        // 4,5,6
