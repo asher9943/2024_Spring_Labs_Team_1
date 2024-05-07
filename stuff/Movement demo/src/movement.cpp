@@ -5,13 +5,13 @@
 // #define USER_STEPHEN
 
 #ifdef USER_DONALD
-  #define MPU_YAW_DRIFT -0.00     // Drift correction for turning
-  #define MPU_ANG_FIX 1.25         // Turn angle correction
-  #define ENC_FIX_FRWD 1         // Forward movement encoder correction
+  #define MPU_YAW_DRIFT 0.01     // Drift correction for turning
+  #define MPU_ANG_FIX 1.19         // Turn angle correction
+  #define ENC_FIX_FRWD -4         // Forward movement encoder correction
   #define ENC_FIX_BKWD -1       // Backward movement encoder correction
 #elif defined(USER_ASHER)
-  #define MPU_YAW_DRIFT 0         // Drift correction for turning
-  #define MPU_ANG_FIX 1.0         // Turn angle correction
+  #define MPU_YAW_DRIFT 0.005         // Drift correction for turning
+  #define MPU_ANG_FIX 1.22         // Turn angle correction
   #define ENC_FIX_FRWD 0          // Forward movement encoder correction
   #define ENC_FIX_BKWD 0          // Backward movement encoder correction
 #else

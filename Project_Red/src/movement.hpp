@@ -129,7 +129,8 @@ void updateAngle(float *curr_angle, float *g_prev, unsigned long *t_prev);
  *      goal_mm > 0 - Move forward
  *      goal_mm < 0 - Move backward
  */
-void moveForwardDist(Encoder enc1, float goal_mm);
+// void moveForwardDist(Encoder enc1, float goal_mm);
+void moveForwardDist(bool forward, float goal_ms);
 
 /*
  *  Turns the mouse by a specified amount

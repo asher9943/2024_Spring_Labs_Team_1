@@ -34,7 +34,8 @@ void loop() {
   delay(2000);
   
   // TODO wait for go from computer
-  moveForwardDist(enc1, 100);
+  // moveForwardDist(enc1, 100);
+  moveForwardDist(true, 100);
 
   while(true) {
     transition = 0;
@@ -59,38 +60,38 @@ void loop() {
       
       // find maze entrance
       do {
-        updateLineFollow(10);
+        updateLineFollow(0);
+        if(lineArray[0] != 0) break;
         delay(10);
       } while(lineArray[0] == 0);
       M1_stop();
       M2_stop();
       delay(100);
 
-      moveForwardDist(enc1, -50);
+      // moveForwardDist(enc1, -100);
+      moveForwardDist(false, 400);
       delay(100);
 
       // skip maze
-      turnAngle(-90);
+      turnAngle(-115);
 
       int count = 0;
-      do {
-        updateMoveForwardPID(true);
-        delay(10);
-        count++;
-      } while(count <= 250); //TODO test
-      M1_stop();
-      M2_stop();
+      moveForwardDist(true, 3000);
       delay(100);
 
-      turnAngle(90);
+      turnAngle(75);
 
       // find line again
       do {
-        moveForwardDist(enc1, 10);
+        updateMoveForwardPID(true);
+        delay(10);
         readLineSensor();
-      } while(lineArray[6] != 1);
-      moveForwardDist(enc1, 75);
+      } while(lineArray[6] != 1 || lineArray[7] != 1); //TODO test
+      M1_stop();
+      M2_stop();
       delay(100);
+      // moveForwardDist(enc1, 50);
+      moveForwardDist(true, 100);
 
       align(false);
       delay(100);
@@ -114,7 +115,7 @@ void loop() {
       do {
         updateLineFollow(-10);
         delay(10);
-      } while(lineArray[12] == 0 && lineArray[0] == 0);
+      } while(lineArray[12] == 0 || lineArray[0] == 0);
       M1_stop();
       M2_stop();
       delay(100);
@@ -129,7 +130,8 @@ void loop() {
       // get parallel to line
       turnAngle(90);
       delay(100);
-      moveForwardDist(enc1, 75);
+      // moveForwardDist(enc1, 75);
+      moveForwardDist(true, 100);
       delay(100);
       turnAngle(-90);
       delay(100);
@@ -150,10 +152,12 @@ void loop() {
       delay(100);
 
       do {
-        moveForwardDist(enc1, 10); //TODO wifi check
+        // moveForwardDist(enc1, 10); //TODO wifi check
+        moveForwardDist(true, 100);
         readLineSensor();
       } while(lineArray[6] != 1);
-      moveForwardDist(enc1, 75);
+      // moveForwardDist(enc1, 75);
+      moveForwardDist(true, 100);
       delay(100);
 
       align(true);
@@ -278,7 +282,8 @@ void loop() {
         readLineSensor();
       } while(lineArray[6] == 0);
 
-      moveForwardDist(enc1, 50);
+      // moveForwardDist(enc1, 50);
+      moveForwardDist(true, 100);
 
       state = 7;
 
