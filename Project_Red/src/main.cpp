@@ -20,7 +20,7 @@ void setup() {
   M1_stop();
   M2_stop();
 
-  state = 1;
+  state = 4;
 
   delay(100);
 }
@@ -134,17 +134,17 @@ void loop() {
       turnAngle(-90);
       delay(100);
       // moveForwardDist(enc1, 75);
-      moveForwardDist(true, 700);
+      moveForwardDist(true, 600);
       delay(100);
-      turnAngle(85);
+      turnAngle(88);
       delay(100);
 
       // skip asteroid field
-      moveForwardDist(true, 3500);
+      moveForwardDist(true, 3550);
       delay(100);
 
       // find line again
-      turnAngle(90);
+      turnAngle(85);
       delay(100);
 
       do {
@@ -152,7 +152,10 @@ void loop() {
         delay(10);
         readLineSensor();
       } while(lineArray[6] != 1); //TODO test
-
+      M1_stop();
+      M2_stop();
+      moveForwardDist(true, 200);
+      delay(100);
       turnAngle(-90);
       delay(100);
 
@@ -165,8 +168,8 @@ void loop() {
       M2_stop();
       delay(100);
 
-moveForwardDist(true, 100);
-      transition_left(enc1);
+      moveForwardDist(true, 100);
+      transition_right(enc1);
       state = 4;
       delay(100);
 
@@ -178,11 +181,7 @@ moveForwardDist(true, 100);
         updateLineFollow(10);
         delay(10);
       } while(lineArray[0] == 0);
-      M1_stop();
-      M2_stop();
-      delay(100);
-
-      turnCorner(enc1, false);
+      turnAngle(-90);
       delay(100);
 
       do {
@@ -204,15 +203,25 @@ moveForwardDist(true, 100);
         delay(100);
 
         do {
-          updateLineFollow(0); //TODO wifi check
-          if(lineArray[0] == 1) turnCorner(enc1, false);
           delay(10);
+          updateLineFollow(10); //TODO wifi check
+        } while(lineArray[0] == 0);
+        turnAngle(-90);
+
+        do {
+          delay(10);
+          updateLineFollow(10); //TODO wifi check
+        } while(lineArray[0] == 0);
+        turnAngle(-90);
+
+        do {
+          delay(10);
+          updateLineFollow(0); //TODO wifi check
         } while(lineArray[12] == 0);
         M1_stop();
         M2_stop();
-        delay(100);
+        turnAngle(90);
 
-        turnCorner(enc1, true);
         delay(100);
 
       } else {  // right
@@ -220,15 +229,11 @@ moveForwardDist(true, 100);
         delay(100);
 
         do {
-          updateLineFollow(0); //TODO wifi check
-          if(lineArray[12] == 1) turnCorner(enc1, true);
+          updateLineFollow(5); //TODO wifi check
+          if(lineArray[0] == 1) turnAngle(90);
           delay(10);
-        } while(lineArray[0] == 0);
-        M1_stop();
-        M2_stop();
-        delay(100);
-
-        turnCorner(enc1, false);
+        } while(lineArray[12] == 0);
+        turnAngle(-90);
         delay(100);
       }
 
@@ -241,6 +246,7 @@ moveForwardDist(true, 100);
       M2_stop();
       delay(100);
 
+      moveForwardDist(true, 100);
       transition_left(enc1);
       state = 5;
       delay(100);
@@ -263,12 +269,14 @@ moveForwardDist(true, 100);
     } else if(state == 6) { // Endor Dash ----------------------------
 
       do {
-        updateLineFollow(10);
+        updateLineFollow(-10);
         delay(10);
-      } while(lineArray[6] == 1);
+      } while(lineArray[6] == 1 || lineArray[7] == 1 || lineArray[5] == 1);
       M1_stop();
       M2_stop();
       delay(100);
+
+      moveForwardDist(true, 100);
 
       do {
         updateMoveForwardPID(true); //TODO wifi check
@@ -277,7 +285,7 @@ moveForwardDist(true, 100);
       } while(lineArray[6] == 0);
 
       // moveForwardDist(enc1, 50);
-      moveForwardDist(true, 100);
+      moveForwardDist(true, 500);
 
       state = 7;
 
