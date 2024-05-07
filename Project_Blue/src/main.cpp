@@ -7,6 +7,7 @@
 #include "transition.hpp"
 #include "heltec_espnow.hpp"
 #include "asteroidfield.hpp"
+#include "maze.hpp"
 
 int state;
 
@@ -34,7 +35,7 @@ void loop() {
   if(state == 0) { // Line of the Republic
     transition = 0;
     do {
-      lineFollow(enc1);
+      updateLineFollow(enc1);
       delay(50);
     } while(transition == 0);
     
@@ -43,57 +44,57 @@ void loop() {
   } else if(state == 1) { // Maze of Mandalore
     transition = 0;
     do {
-
+      navigateMaze();
     } while(transition == 0);
     
     transition_left();
     state = 2;
-  } else if(state == 2) { // Kessel Run
-    transition = 0;
-    do {
-      lineFollow(enc1);
-      delay(50);
-    } while(transition == 0);
+  } //else if(state == 2) { // Kessel Run
+  //   transition = 0;
+  //   do {
+  //     lineFollow(enc1);
+  //     delay(50);
+  //   } while(transition == 0);
     
-    transition_left();
-    state = 3;
-  } else if(state == 3) { // Hoth Asteroid Field
-    transition = 0;
-    do {
-      lineFollow(enc1);
-      delay(50);
-      // if() {
-      //   move_around();
-      // }
-    } while(transition == 0);
+  //   transition_left();
+  //   state = 3;
+  // } else if(state == 3) { // Hoth Asteroid Field
+  //   transition = 0;
+  //   do {
+  //     lineFollow(enc1);
+  //     delay(50);
+  //     // if() {
+  //     //   move_around();
+  //     // }
+  //   } while(transition == 0);
     
-    transition_left();
-    state = 4;
-  } else if(state == 4) { // Path of Dual Fates
-    transition = 0;
-    do {
+  //   transition_left();
+  //   state = 4;
+  // } else if(state == 4) { // Path of Dual Fates
+  //   transition = 0;
+  //   do {
 
-    } while(transition == 0);
+  //   } while(transition == 0);
     
-    transition_left();
-    state = 5;
-  } else if(state == 5) { // Second Line of the Republic
-    transition = 0;
-    do {
-      lineFollow(enc1);
-      delay(50);
-    } while(transition == 0);
+  //   transition_left();
+  //   state = 5;
+  // } else if(state == 5) { // Second Line of the Republic
+  //   transition = 0;
+  //   do {
+  //     lineFollow(enc1);
+  //     delay(50);
+  //   } while(transition == 0);
     
-    transition_left();
-    state = 6;
-  } else if(state == 6) { // Endor Dash
-    transition = 0;
-    do {
+  //   transition_left();
+  //   state = 6;
+  // } else if(state == 6) { // Endor Dash
+  //   transition = 0;
+  //   do {
 
-    } while(transition == 0);
+  //   } while(transition == 0);
     
-    state = 7;
-  } else { // Finish
+  //   state = 7;
+  // } else { // Finish
 
-  }  
+  // }  
 }
