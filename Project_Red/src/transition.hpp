@@ -15,9 +15,9 @@
 /**
  * Transitions using a right turn
 */
-void transition_right();
+void transition_right(Encoder enc1);
 /**
  * Transitions using a left turn
 */
-void transition_left();
+void transition_left(Encoder enc1);
 #endif
