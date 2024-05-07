@@ -35,8 +35,10 @@ extern const unsigned int M1_ENC_B;
 extern const unsigned int M2_ENC_A;
 extern const unsigned int M2_ENC_B;
 
+
 // Transition Variable
 extern int transition;
+
 
 /* To use the encoders:
 
@@ -127,7 +129,8 @@ void updateAngle(float *curr_angle, float *g_prev, unsigned long *t_prev);
  *      goal_mm > 0 - Move forward
  *      goal_mm < 0 - Move backward
  */
-void moveForwardDist(Encoder enc1, float goal_mm);
+// void moveForwardDist(Encoder enc1, float goal_mm);
+void moveForwardDist(bool forward, float goal_ms);
 
 /*
  *  Turns the mouse by a specified amount
@@ -145,6 +148,12 @@ void turnAngle(float goal);
 void turnCorner(Encoder enc1, bool ccw);
 
 /*
+ *  Aligns the mouse on a white line
+ *    ccw  - If true, mouse turns ccw
+ */
+void align(bool ccw);
+
+/*
  *  Moves the mouse forward (or backward) using IMU for PID
  *    forward - If true mouse moves forward, else it moves backward
  */
@@ -154,7 +163,13 @@ void updateMoveForwardPID(bool forward);
  *  Follows a line, function updates the lineFollow PID
  *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
  */
-void updateLineFollow(Encoder enc1);
+void updateLineFollow(int boost);
+
+/*
+ *  Follows a line, accounts for intersections
+ *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
+ */
+void updateLineFollowInter(Encoder enc1);
 
 /*  
  *  Detect the type of intersection the mouse is at
