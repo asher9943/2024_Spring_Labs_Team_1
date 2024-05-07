@@ -20,7 +20,7 @@ void setup() {
   M1_stop();
   M2_stop();
 
-  state = 0;
+  state = 1;
 
   delay(100);
 }
@@ -75,25 +75,26 @@ void loop() {
       // skip maze
       turnAngle(-115);
 
-      int count = 0;
-      moveForwardDist(true, 3000);
+      
+      moveForwardDist(true, 3500);
       delay(100);
 
-      turnAngle(75);
+      turnAngle(100);
 
       // find line again
       do {
         updateMoveForwardPID(true);
         delay(10);
         readLineSensor();
-      } while(lineArray[6] != 1 || lineArray[7] != 1); //TODO test
+      } while(lineArray[6] != 1); //TODO test
       M1_stop();
       M2_stop();
       delay(100);
       // moveForwardDist(enc1, 50);
-      moveForwardDist(true, 100);
+      moveForwardDist(true, 400);
 
-      align(false);
+      // align(false);
+      turnAngle(-90);
       delay(100);
 
       // finish section
@@ -105,6 +106,7 @@ void loop() {
       M2_stop();
       delay(100);
 
+      moveForwardDist(true, 100);
       transition_left(enc1);
       state = 2;
       delay(100);
@@ -120,6 +122,7 @@ void loop() {
       M2_stop();
       delay(100);
 
+      moveForwardDist(true, 100);
       transition_left(enc1);
       state = 3;
       delay(100);
@@ -128,39 +131,29 @@ void loop() {
     } else if(state == 3) { // Hoth Asteroid Field ---------------------
 
       // get parallel to line
-      turnAngle(90);
+      turnAngle(-90);
       delay(100);
       // moveForwardDist(enc1, 75);
-      moveForwardDist(true, 100);
+      moveForwardDist(true, 700);
       delay(100);
-      turnAngle(-90);
+      turnAngle(85);
       delay(100);
 
       // skip asteroid field
-      int count = 0;
-      do {
-        updateMoveForwardPID(true); //TODO wifi check
-        delay(10);
-        count++;
-      } while(count <= 200); //TODO test
-      M1_stop();
-      M2_stop();
+      moveForwardDist(true, 3500);
       delay(100);
 
       // find line again
-      turnAngle(-90);
+      turnAngle(90);
       delay(100);
 
       do {
-        // moveForwardDist(enc1, 10); //TODO wifi check
-        moveForwardDist(true, 100);
+        updateMoveForwardPID(true);
+        delay(10);
         readLineSensor();
-      } while(lineArray[6] != 1);
-      // moveForwardDist(enc1, 75);
-      moveForwardDist(true, 100);
-      delay(100);
+      } while(lineArray[6] != 1); //TODO test
 
-      align(true);
+      turnAngle(-90);
       delay(100);
 
       // finish section
@@ -172,6 +165,7 @@ void loop() {
       M2_stop();
       delay(100);
 
+moveForwardDist(true, 100);
       transition_left(enc1);
       state = 4;
       delay(100);
