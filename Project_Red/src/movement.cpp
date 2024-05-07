@@ -364,7 +364,7 @@ void align(bool ccw) {
   }
 
   while(lineArray[6] != 1); {
-    delay(100);
+    delay(10);
     readLineSensor();
   } 
 
@@ -432,7 +432,7 @@ void updateLineFollow(int boost) {
   // static float total_error = 0;
 
   float pid_val = 0;
-  float Kp = 5;
+  float Kp = 7;
   float Kd = 40;
   // float Ki = 0.015;
 
