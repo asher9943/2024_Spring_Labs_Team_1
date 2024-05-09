@@ -169,7 +169,7 @@ void updateLineFollow(int boost);
  *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
  */
 void updateLineFollowInter(Encoder enc1);
-
+void align(bool ccw);
 /*  
  *  Detect the type of intersection the mouse is at
  * 

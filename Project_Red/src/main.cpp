@@ -20,7 +20,7 @@ void setup() {
   M1_stop();
   M2_stop();
 
-  state = 4;
+  state = 0;
 
   delay(100);
 }
@@ -29,13 +29,11 @@ void setup() {
 void loop() {
   Encoder enc1(M1_ENC_A, M1_ENC_B);
   Encoder enc2(M2_ENC_A, M2_ENC_B);
- Serial.print("hi");
 
   delay(2000);
   
   // TODO wait for go from computer
-  // moveForwardDist(enc1, 100);
-  moveForwardDist(true, 100);
+  moveForwardDist(true, 300);
 
   while(true) {
     transition = 0;
@@ -43,14 +41,14 @@ void loop() {
     if(state == 0) { // Line of the Republic ---------------------------
       
       do {
-        updateLineFollow(10);
         delay(10);
+        updateLineFollow(10);
       } while(lineArray[12] == 0 && lineArray[0] == 0);
       M1_stop();
       M2_stop();
       delay(100);
 
-      transition_right(enc1);
+      transition_right(400);
       state = 1;
       delay(100);
       // tell next robot to go?
@@ -60,54 +58,54 @@ void loop() {
       
       // find maze entrance
       do {
-        updateLineFollow(0);
-        if(lineArray[0] != 0) break;
         delay(10);
+        updateLineFollow(-10);
       } while(lineArray[0] == 0);
       M1_stop();
       M2_stop();
       delay(100);
 
-      // moveForwardDist(enc1, -100);
+      // skip maze
       moveForwardDist(false, 400);
       delay(100);
-
-      // skip maze
-      turnAngle(-115);
-
       
-      moveForwardDist(true, 3500);
+      turnAngle(-95);
+      delay(100);
+      
+      moveForwardDist(true, 2600);
       delay(100);
 
-      turnAngle(100);
-
+      
       // find line again
+      turnAngle(90);
+      delay(100);
+
       do {
         updateMoveForwardPID(true);
         delay(10);
         readLineSensor();
-      } while(lineArray[6] != 1); //TODO test
+      } while(lineArray[6] != 1);
       M1_stop();
       M2_stop();
       delay(100);
-      // moveForwardDist(enc1, 50);
-      moveForwardDist(true, 400);
+      
+      moveForwardDist(true, 250);
+      delay(100);
 
-      // align(false);
       turnAngle(-90);
       delay(100);
 
+
       // finish section
       do {
-        updateLineFollow(0);
         delay(10);
+        updateLineFollow(-10);
       } while(lineArray[12] == 0 && lineArray[0] == 0);
       M1_stop();
       M2_stop();
       delay(100);
 
-      moveForwardDist(true, 100);
-      transition_left(enc1);
+      transition_left(550);
       state = 2;
       delay(100);
 
@@ -115,15 +113,14 @@ void loop() {
     } else if(state == 2) { // Kessel Run -----------------------------
 
       do {
-        updateLineFollow(-10);
         delay(10);
+        updateLineFollow(-20);
       } while(lineArray[12] == 0 || lineArray[0] == 0);
       M1_stop();
       M2_stop();
       delay(100);
 
-      moveForwardDist(true, 100);
-      transition_left(enc1);
+      transition_left(600);
       state = 3;
       delay(100);
 
@@ -133,18 +130,19 @@ void loop() {
       // get parallel to line
       turnAngle(-90);
       delay(100);
-      // moveForwardDist(enc1, 75);
+
       moveForwardDist(true, 600);
       delay(100);
-      turnAngle(88);
+      turnAngle(80);
       delay(100);
 
       // skip asteroid field
-      moveForwardDist(true, 3550);
+      moveForwardDist(true, 2400);
       delay(100);
+      
 
       // find line again
-      turnAngle(85);
+      turnAngle(90);
       delay(100);
 
       do {
@@ -156,20 +154,19 @@ void loop() {
       M2_stop();
       moveForwardDist(true, 200);
       delay(100);
-      turnAngle(-90);
+      turnAngle(-95);
       delay(100);
 
       // finish section
       do {
-        updateLineFollow(0);
         delay(10);
+        updateLineFollow(-10);
       } while(lineArray[12] == 0 && lineArray[0] == 0);
       M1_stop();
       M2_stop();
       delay(100);
 
-      moveForwardDist(true, 100);
-      transition_right(enc1);
+      transition_right(600);
       state = 4;
       delay(100);
 
@@ -178,16 +175,16 @@ void loop() {
 
       // get in place
       do {
-        updateLineFollow(10);
+        updateLineFollow(0);
         delay(10);
       } while(lineArray[0] == 0);
       turnAngle(-90);
       delay(100);
 
       do {
-        updateLineFollow(10);
+        updateLineFollow(-5);
         delay(10);
-      } while(lineArray[12] == 0 && lineArray[0] == 0);
+      } while(lineArray[12] == 0 || lineArray[0] == 0);
       M1_stop();
       M2_stop();
       delay(100);
@@ -196,58 +193,72 @@ void loop() {
 
 
       while(0); //wait for information
+      moveForwardDist(true, 200);
 
       // select direction
-      if(1) {   // left
-        turnCorner(enc1, true);
-        delay(100);
-
-        do {
-          delay(10);
-          updateLineFollow(10); //TODO wifi check
-        } while(lineArray[0] == 0);
-        turnAngle(-90);
-
-        do {
-          delay(10);
-          updateLineFollow(10); //TODO wifi check
-        } while(lineArray[0] == 0);
-        turnAngle(-90);
-
-        do {
-          delay(10);
-          updateLineFollow(0); //TODO wifi check
-        } while(lineArray[12] == 0);
-        M1_stop();
-        M2_stop();
+      if(0) {   // left
         turnAngle(90);
-
         delay(100);
+
+        do {
+          delay(10);
+          updateLineFollow(0);
+        } while(lineArray[0] == 0);
+        turnAngle(-90);
+        delay(100);
+
+        do {
+          delay(10);
+          updateLineFollow(0);
+        } while(lineArray[0] == 0);
+        turnAngle(-90);
+        delay(100);
+
+        do {
+          delay(10);
+          updateLineFollow(-5);
+        } while(lineArray[12] == 0);
+        turnAngle(90);
+        delay(100);
+
 
       } else {  // right
-        turnCorner(enc1, false);
+        turnAngle(-90);
         delay(100);
 
         do {
-          updateLineFollow(5); //TODO wifi check
-          if(lineArray[0] == 1) turnAngle(90);
           delay(10);
+          updateLineFollow(0);
         } while(lineArray[12] == 0);
+        turnAngle(90);
+        delay(100);
+
+        do {
+          delay(10);
+          updateLineFollow(0);
+        } while(lineArray[12] == 0);
+        turnAngle(90);
+        delay(100);
+
+        do {
+          delay(10);
+          updateLineFollow(-5);
+        } while(lineArray[0] == 0);
         turnAngle(-90);
         delay(100);
+
       }
 
       // follow line to end
       do {
-        updateLineFollow(10);
+        updateLineFollow(-5);
         delay(10);
-      } while(lineArray[12] == 0 && lineArray[0] == 0);
+      } while(lineArray[12] == 0 || lineArray[0] == 0);
       M1_stop();
       M2_stop();
       delay(100);
 
-      moveForwardDist(true, 100);
-      transition_left(enc1);
+      transition_left(500);
       state = 5;
       delay(100);
 
@@ -255,44 +266,36 @@ void loop() {
     } else if(state == 5) { // Second Line of the Republic ------------
 
       do {
-        updateLineFollow(10);
+        updateLineFollow(-10);
         delay(10);
-      } while(lineArray[12] == 0 && lineArray[0] == 0);
-      M1_stop();
+      } while(lineArray[12] == 0 || lineArray[0] == 0);
       M2_stop();
+      delay(10);
+      M1_stop();
       delay(100);
 
-      transition_left(enc1);
+      transition_left(500);
       state = 6;
 
 
     } else if(state == 6) { // Endor Dash ----------------------------
-
-      do {
-        updateLineFollow(-10);
-        delay(10);
-      } while(lineArray[6] == 1 || lineArray[7] == 1 || lineArray[5] == 1);
-      M1_stop();
-      M2_stop();
-      delay(100);
-
-      moveForwardDist(true, 100);
+     
 
       do {
         updateMoveForwardPID(true); //TODO wifi check
         delay(10);
         readLineSensor();
-      } while(lineArray[6] == 0);
+      } while(lineArray[12] == 0 || lineArray[0] == 0);
 
-      // moveForwardDist(enc1, 50);
-      moveForwardDist(true, 500);
+
+      moveForwardDist(true, 250);
 
       state = 7;
 
 
     } else { // Finish -----------------------------------------------
       while(1) {
-        turnAngle(90);
+        turnAngle(-90);
        //TODO wifi check
       }
 

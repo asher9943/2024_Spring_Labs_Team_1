@@ -6,9 +6,9 @@
 
 #ifdef USER_DONALD
   #define MPU_YAW_DRIFT 0.01     // Drift correction for turning
-  #define MPU_ANG_FIX 1.19         // Turn angle correction
-  #define ENC_FIX_FRWD -4         // Forward movement encoder correction
-  #define ENC_FIX_BKWD -1       // Backward movement encoder correction
+  #define MPU_ANG_FIX 1.3         // Turn angle correction
+  #define ENC_FIX_FRWD -5         // Forward movement encoder correction
+  #define ENC_FIX_BKWD -5       // Backward movement encoder correction
 #elif defined(USER_ASHER)
   #define MPU_YAW_DRIFT 0.005         // Drift correction for turning
   #define MPU_ANG_FIX 1.22         // Turn angle correction
@@ -20,6 +20,7 @@
   #define ENC_FIX_FRWD 0          // Forward movement encoder correction
   #define ENC_FIX_BKWD 0          // Backward movement encoder correction
 #endif
+
 
 
 
@@ -64,7 +65,7 @@ int adc2_buf[8];
 
 uint8_t lineArray[13];
 
-const float LINE_MID = 6;
+const float LINE_MID = 5;
 float pos_prev = LINE_MID;
 
 
@@ -264,28 +265,40 @@ void updateAngle(float *curr_angle, float *g_prev, unsigned long *t_prev) {
  *      goal_mm > 0 - Move forward
  *      goal_mm < 0 - Move backward
  */
-void moveForwardDist(Encoder enc1, float goal_mm) {
-  long goal_tick = 3.581*goal_mm;
+// void moveForwardDist(Encoder enc1, float goal_mm) {
+void moveForwardDist(bool forward, float goal_ms) {
+  unsigned long t_start = millis();
+  unsigned long t_tot = t_start;
 
-  long enc_value = enc1.read();
-  long enc_base = enc_value;
   
-
-  // move motors
-  if(goal_tick > 0) {
-    M1_forward(PWM_BASE + ENC_FIX_FRWD);
-    M2_forward(PWM_BASE - ENC_FIX_FRWD);
-  } else {
-    M1_backward(PWM_BASE + ENC_FIX_BKWD);
-    M2_backward(PWM_BASE - ENC_FIX_BKWD);
-  }
-
-  // Poll until encoder goal is reached
-  while(abs(enc_value-enc_base) < abs(goal_tick)) enc_value = enc1.read();
-
-  // stop motors
+  do {
+    updateMoveForwardPID(forward);
+    delay(10);
+    t_tot = millis() - t_start;
+  } while(t_tot < goal_ms); //TODO test
   M1_stop();
   M2_stop();
+  // long goal_tick = 3.581*goal_mm;
+
+  // long enc_value = enc1.read();
+  // long enc_base = enc_value;
+  
+
+  // // move motors
+  // if(goal_tick > 0) {
+  //   M1_forward(PWM_BASE + ENC_FIX_FRWD);
+  //   M2_forward(PWM_BASE - ENC_FIX_FRWD);
+  // } else {
+  //   M1_backward(PWM_BASE + ENC_FIX_BKWD);
+  //   M2_backward(PWM_BASE - ENC_FIX_BKWD);
+  // }
+
+  // // Poll until encoder goal is reached
+  // while(abs(enc_value-enc_base) < abs(goal_tick)) enc_value = enc1.read();
+
+  // // stop motors
+  // M1_stop();
+  // M2_stop();
 }
 
 
@@ -324,7 +337,8 @@ void turnAngle(float goal) {
  */
 void turnCorner(Encoder enc1, bool ccw) {
   // move forward until axis is aligned
-  moveForwardDist(enc1, 75);
+  // moveForwardDist(enc1, 75);
+moveForwardDist(true, 250); //TODO test
 
   delay(100);
 
@@ -342,16 +356,20 @@ void turnCorner(Encoder enc1, bool ccw) {
  */
 void align(bool ccw) {
   if (ccw) {
-    M1_backward(PWM_BASE);
-    M2_forward(PWM_BASE);
+    M1_backward(PWM_BASE-10);
+    M2_forward(PWM_BASE-10);
   } else {
-    M1_forward(PWM_BASE);
-    M2_backward(PWM_BASE);
+    M1_forward(PWM_BASE-10);
+    M2_backward(PWM_BASE-10);
   }
-
+readLineSensor();
   while(lineArray[6] != 1); {
     delay(100);
     readLineSensor();
+        for(int i = 0; i < 13; i++) {
+      Serial.print(lineArray[i]); Serial.print(" ");
+    }
+    Serial.println(" ");
   } 
 
   M1_stop();
@@ -418,8 +436,8 @@ void updateLineFollow(int boost) {
   // static float total_error = 0;
 
   float pid_val = 0;
-  float Kp = 5;
-  float Kd = 25;
+  float Kp = 6;
+  float Kd = 40;
   // float Ki = 0.015;
 
   uint8_t intersection = 0;
@@ -540,7 +558,8 @@ int intersectionDetect(Encoder enc1) {
   uint8_t left_prev = lineArray[12];
 
   // move forward again
-  moveForwardDist(enc1, 75);
+  // moveForwardDist(enc1, 75);
+  moveForwardDist(true, 250); //TODO TEST
   delay(50);
 
   readLineSensor();
