@@ -33,13 +33,21 @@ void loop() {
   delay(2000);
   
   // TODO wait for go from computer
-  moveForwardDist(true, 300);
 
   while(true) {
     transition = 0;
     
     if(state == 0) { // Line of the Republic ---------------------------
-      
+
+      // go onto line
+      do {
+        updateMoveForwardPID(true);
+        delay(10);
+        readLineSensor();
+      } while(lineArray[0] == 0 || lineArray[12] == 0);
+
+
+      // line follow
       do {
         delay(10);
         updateLineFollow(10);
@@ -48,6 +56,8 @@ void loop() {
       M2_stop();
       delay(100);
 
+
+      // transition
       transition_right(400);
       state = 1;
       delay(100);
@@ -64,6 +74,7 @@ void loop() {
       M1_stop();
       M2_stop();
       delay(100);
+
 
       // skip maze
       moveForwardDist(false, 400);
@@ -105,6 +116,8 @@ void loop() {
       M2_stop();
       delay(100);
 
+
+      // transition
       transition_left(550);
       state = 2;
       delay(100);
@@ -120,6 +133,8 @@ void loop() {
       M2_stop();
       delay(100);
 
+
+      // transition
       transition_left(600);
       state = 3;
       delay(100);
@@ -127,16 +142,16 @@ void loop() {
 
     } else if(state == 3) { // Hoth Asteroid Field ---------------------
 
-      // get parallel to line
+      // get parallel to line and skip asteroid field
       turnAngle(-90);
       delay(100);
 
       moveForwardDist(true, 600);
       delay(100);
+
       turnAngle(80);
       delay(100);
 
-      // skip asteroid field
       moveForwardDist(true, 2400);
       delay(100);
       
@@ -149,13 +164,17 @@ void loop() {
         updateMoveForwardPID(true);
         delay(10);
         readLineSensor();
-      } while(lineArray[6] != 1); //TODO test
+      } while(lineArray[6] != 1);
       M1_stop();
       M2_stop();
+      delay(100);
+
       moveForwardDist(true, 200);
       delay(100);
+
       turnAngle(-95);
       delay(100);
+
 
       // finish section
       do {
@@ -166,6 +185,8 @@ void loop() {
       M2_stop();
       delay(100);
 
+
+      // transition
       transition_right(600);
       state = 4;
       delay(100);
@@ -189,14 +210,16 @@ void loop() {
       M2_stop();
       delay(100);
 
-      // tell computer to listen
+      // TODO tell computer to listen
 
 
-      while(0); //wait for information
+      while(0); //TODO wait for information
+
+
+      // go onto path
       moveForwardDist(true, 200);
 
-      // select direction
-      if(0) {   // left
+      if(0) {           // left
         turnAngle(90);
         delay(100);
 
@@ -222,7 +245,7 @@ void loop() {
         delay(100);
 
 
-      } else {  // right
+      } else {          // right
         turnAngle(-90);
         delay(100);
 
@@ -248,6 +271,7 @@ void loop() {
         delay(100);
 
       }
+
 
       // follow line to end
       do {
@@ -258,6 +282,8 @@ void loop() {
       M2_stop();
       delay(100);
 
+
+      // transtion
       transition_left(500);
       state = 5;
       delay(100);
@@ -265,6 +291,7 @@ void loop() {
 
     } else if(state == 5) { // Second Line of the Republic ------------
 
+      // line follow
       do {
         updateLineFollow(-10);
         delay(10);
@@ -274,31 +301,34 @@ void loop() {
       M1_stop();
       delay(100);
 
+
+      // transition
       transition_left(500);
       state = 6;
 
 
     } else if(state == 6) { // Endor Dash ----------------------------
      
-
+      // go straight
       do {
-        updateMoveForwardPID(true); //TODO wifi check
+        updateMoveForwardPID(true);
         delay(10);
         readLineSensor();
       } while(lineArray[12] == 0 || lineArray[0] == 0);
 
 
+      // center on box
       moveForwardDist(true, 250);
 
+
+      // transition
       state = 7;
 
 
     } else { // Finish -----------------------------------------------
       while(1) {
         turnAngle(-90);
-       //TODO wifi check
       }
-
     }
   }
 }

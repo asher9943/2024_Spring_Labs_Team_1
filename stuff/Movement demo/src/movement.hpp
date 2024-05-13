@@ -129,7 +129,7 @@ void updateAngle(float *curr_angle, float *g_prev, unsigned long *t_prev);
  *      goal_mm > 0 - Move forward
  *      goal_mm < 0 - Move backward
  */
-void moveForwardDist(Encoder enc1, float goal_mm);
+void moveForwardDist(bool forward, float goal_ms);
 
 /*
  *  Turns the mouse by a specified amount
@@ -146,11 +146,6 @@ void turnAngle(float goal);
  */
 void turnCorner(Encoder enc1, bool ccw);
 
-/*
- *  Aligns the mouse on a white line
- *    ccw  - If true, mouse turns ccw
- */
-void align(bool ccw);
 
 /*
  *  Moves the mouse forward (or backward) using IMU for PID
@@ -169,7 +164,7 @@ void updateLineFollow(int boost);
  *    enc1 - Pointer to encoder 1 (in reality, can also be enc2)
  */
 void updateLineFollowInter(Encoder enc1);
-void align(bool ccw);
+
 /*  
  *  Detect the type of intersection the mouse is at
  * 
