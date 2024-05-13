@@ -37,22 +37,22 @@ void loop() {
     // set MPU_ANG_FIX so that the turns are perfect
     // test both -90 and 90
     // MPU_ANG_FIX is scaling, so it should be 0.7-1.3 at most
-    // turnAngle(-90);
-    // delay(500);
-    // turnAngle(-90);
-    // delay(500);
-    // turnAngle(-90);
-    // delay(500);
-    // turnAngle(-90);
-    // delay(500);
-    // turnAngle(90);
-    // delay(500);
-    // turnAngle(90);
-    // delay(500);
-    // turnAngle(90);
-    // delay(500);
-    // turnAngle(90);
-    // delay(500);
+    turnAngle(-90);
+    delay(500);
+    turnAngle(-90);
+    delay(500);
+    turnAngle(-90);
+    delay(500);
+    turnAngle(-90);
+    delay(500);
+    turnAngle(90);
+    delay(500);
+    turnAngle(90);
+    delay(500);
+    turnAngle(90);
+    delay(500);
+    turnAngle(90);
+    delay(500);
 
 
 
@@ -66,13 +66,13 @@ void loop() {
 
 
     /*         Line Sensor Debug        */
-    readLineSensor();
-    for(int i = 0; i < 13; i++) {
-      Serial.print(lineArray[i]); Serial.print(" ");
-    }
-    Serial.println(" ");
+    // readLineSensor();
+    // for(int i = 0; i < 13; i++) {
+    //   Serial.print(lineArray[i]); Serial.print(" ");
+    // }
+    // Serial.println(" ");
 
-
+// delay(500);
 
     /*            Turning Demo            */
 
