@@ -65,7 +65,7 @@ int adc2_buf[8];
 
 uint8_t lineArray[13];
 
-const float LINE_MID = 5;
+const float LINE_MID = 5.5;
 float pos_prev = LINE_MID;
 
 
