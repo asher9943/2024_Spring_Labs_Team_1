@@ -5,7 +5,7 @@
  ******************************************************************
  */
 
-float pos_prev;
+float pos_prev_maze;
 int step;
 int prev_step;
 
@@ -75,7 +75,7 @@ void mazeLineFollow(int boost) {
   }
 
   // update "previous" values
-  pos_prev = pos;
+  pos_prev_maze = pos;
   prev_error = error;
 }
 
@@ -92,10 +92,10 @@ void navigateMaze() {
     }
     if(step == 6 || step == 7 || step == 15) {
         moveForwardDist(true, 250);
-        align(false);
+        turnAngle(90);
     } else if(step == 11 || step == 12) {
         moveForwardDist(true,250);
-        align(true);
+        turnAngle(90);
     } else if(step == 16) {
         transition = 1;
     }
@@ -107,5 +107,5 @@ void navigateMaze() {
 void initMaze() {
     step = 0;
     prev_step = 0;
-    pos_prev = LINE_MID;
+    pos_prev_maze = LINE_MID;
 }
