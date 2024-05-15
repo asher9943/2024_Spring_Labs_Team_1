@@ -4,12 +4,17 @@ import imutils
 
 # https://medium.com/@sardorabdirayimov/colors-detection-using-masks-contours-in-opencv-72d127f0797e
 
-THRESHOLD = 3000
+# For documentation: Height: 480, width: 640
+# Area threshold avoids noise
+THRESHOLD = 1000
+# Bounding box constants
+BOX_START = (250, 150)
+BOX_END = (400, 400)
 
 colors = {
     "blue": [np.array([90, 175, 20]), np.array([130, 255, 255])],
     "red": [np.array([160, 165, 20]), np.array([180, 255, 255])],
-    "green": [np.array([35, 80, 20]), np.array([70, 255, 255])],
+    "green": [np.array([35, 40, 20]), np.array([70, 255, 255])],
 }
 
 
@@ -34,6 +39,11 @@ def show_contours(frame, points):
 def main():
     cap = cv2.VideoCapture(0)
 
+    ret, image = cap.read()
+    height, width, channels = image.shape
+
+    print(f"Height: {height}, width: {width}")
+
     while cap.isOpened():
         ret, image = cap.read()
 
@@ -42,9 +52,14 @@ def main():
         #     show_mask(cv2.cvtColor(image, cv2.COLOR_BGR2HSV), colors["green"]),
         # )
 
+        # Show bounding box
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        image = show_contours(image, colors["green"])
+        image = cv2.rectangle(image, BOX_START, BOX_END, (0, 255, 255), 10)
+
         cv2.imshow(
             "Contour filtered img",
-            show_contours(cv2.cvtColor(image, cv2.COLOR_BGR2HSV), colors["green"]),
+            image,
         )
 
         cv2.waitKey(25)
