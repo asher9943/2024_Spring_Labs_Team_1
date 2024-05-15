@@ -6,32 +6,22 @@ import imutils
 
 # may need to fine tune these for our camera(s)
 COLORS = {
-    "blue": [np.array([95, 255, 85]), np.array([120, 255, 255])],
-    "red": [np.array([161, 165, 127]), np.array([178, 255, 255])],
-    "yellow": [np.array([16, 0, 99]), np.array([39, 255, 255])],
-    "green": [np.array([33, 19, 105]), np.array([77, 255, 255])],
+    "blue": [np.array([90, 175, 20]), np.array([130, 255, 255])],
+    "red": [np.array([160, 165, 20]), np.array([180, 255, 255])],
+    "green": [np.array([35, 40, 20]), np.array([70, 255, 255])],
 }
 
-# definitely need to finetune this through map testing
-AREA_THRESHOLD = 5000
+# For documentation: Height: 480, width: 640
+# Area threshold avoids noise
+THRESHOLD = 1000
+
+# Bounding box constants
+BOX_START = (250, 150)
+BOX_END = (400, 400)
 
 
-def is_colored_region(camera):
-    cap = cv2.VideoCapture(camera)
+def is_block():
+    cap = cv2.VideoCapture(0)
 
-    frame = cv2.cvtColor(cap, cv2.COLOR_BGR2HSV)
-
-    for color in COLORS:
-        # create mask with boundaries
-        mask = cv2.inRange(frame, color[0], color[1])
-
-        # find contours from mask
-        cnts = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        cnts = imutils.grab_contours(cnts)
-
-        for c in cnts:
-            area = cv2.contourArea(c)
-            if area > AREA_THRESHOLD:
-                return b"true"
-
-    return b"false"
+    while cap.isOpened():
+        ret, image = cap.read()
