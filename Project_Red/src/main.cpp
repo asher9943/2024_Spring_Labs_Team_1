@@ -44,7 +44,7 @@ void loop() {
         updateMoveForwardPID(true);
         delay(10);
         readLineSensor();
-      } while(lineArray[0] == 0 || lineArray[12] == 0);
+      } while(lineArray[0] == 1 || lineArray[12] == 1);
 
 
       // line follow
@@ -58,7 +58,7 @@ void loop() {
 
 
       // transition
-      transition_right(400);
+      transition_right(350);
       state = 1;
       delay(100);
       // tell next robot to go?
@@ -70,7 +70,7 @@ void loop() {
       do {
         delay(10);
         updateLineFollow(-10);
-      } while(lineArray[0] == 0);
+      } while(lineArray[0] == 0 || lineArray[6] == 0);
       M1_stop();
       M2_stop();
       delay(100);
@@ -135,7 +135,7 @@ void loop() {
 
 
       // transition
-      transition_left(600);
+      transition_left(500);
       state = 3;
       delay(100);
 
@@ -152,7 +152,7 @@ void loop() {
       turnAngle(80);
       delay(100);
 
-      moveForwardDist(true, 2400);
+      moveForwardDist(true, 2300);
       delay(100);
       
 
@@ -187,7 +187,7 @@ void loop() {
 
 
       // transition
-      transition_right(600);
+      transition_right(550);
       state = 4;
       delay(100);
 
@@ -196,31 +196,53 @@ void loop() {
 
       // get in place
       do {
-        updateLineFollow(0);
         delay(10);
-      } while(lineArray[0] == 0);
+        updateLineFollow(0);
+      } while(lineArray[0] == 0 || lineArray[6] == 0);
       turnAngle(-90);
       delay(100);
 
       do {
-        updateLineFollow(-5);
         delay(10);
-      } while(lineArray[12] == 0 || lineArray[0] == 0);
+        updateLineFollow(-5);
+      } while(lineArray[12] == 0 && lineArray[0] == 0);
       M1_stop();
       M2_stop();
       delay(100);
 
+
       // TODO tell computer to listen
+      moveForwardDist(true, 200);
+      delay(100);
+      turnAngle(90);
+      delay(100);
+
+      do {
+        delay(10);
+        updateLineFollow(0);
+      } while(lineArray[0] == 0);
+      M1_stop();
+      M2_stop();
+      delay(2000);    // TODO listen Left
+
+      turnAngle(-180);
+      delay(100);
+
+      do {
+        delay(10);
+        updateLineFollow(0);
+      } while(lineArray[12] == 0);
+      M1_stop();
+      M2_stop();
+      delay(2000);    // TODO listen right
 
 
       while(0); //TODO wait for information
 
 
-      // go onto path
-      moveForwardDist(true, 200);
 
-      if(0) {           // left
-        turnAngle(90);
+      if(1) {           // left
+        turnAngle(180);
         delay(100);
 
         do {
@@ -246,13 +268,6 @@ void loop() {
 
 
       } else {          // right
-        turnAngle(-90);
-        delay(100);
-
-        do {
-          delay(10);
-          updateLineFollow(0);
-        } while(lineArray[12] == 0);
         turnAngle(90);
         delay(100);
 
@@ -319,6 +334,19 @@ void loop() {
 
       // center on box
       moveForwardDist(true, 250);
+      delay(100);
+
+      // if(lineArray[12] == 0) {
+      //   turnAngle(-90);
+      //   delay(100);
+      //   moveForwardDist(true, 100);
+      //   delay(100);
+      // } else if(lineArray[0] == 0) {
+      //   turnAngle(90);
+      //   delay(100);
+      //   moveForwardDist(true, 100);
+      //   delay(100);
+      // }
 
 
       // transition
