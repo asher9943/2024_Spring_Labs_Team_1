@@ -18,16 +18,17 @@ DUAL_FATES_RESULT = b"Dual fates result"
 MAZE_DONE = b"Maze done"
 DUAL_FATES_DONE = b"Dual fates done"
 
+powercalc = audio_processor.PowerCalculator()
+
 
 # Ensures we handle ctrl-c kill gracefully
 def handler(signum, frame):
     print("\nKeyboard interrupt ... exiting")
+    powercalc.terminate()
     exit(0)
 
 
 def main():
-    powercalc = audio_processor.PowerCalculator
-
     left_power = 0
     right_power = 0
 
@@ -56,11 +57,13 @@ def main():
                 if msg == MAZE_CAM:
                     conn.send(is_block())
                 elif msg == DUAL_FATES_LEFT:
-                    left_power = powercalc.calculate_power
+                    left_power = powercalc.calculate_power()
+                    print(f"LEFT POWER: {left_power}")
                 elif msg == DUAL_FATES_RIGHT:
-                    right_power = powercalc.calculate_power
+                    right_power = powercalc.calculate_power()
+                    print(f"RIGHT POWER: {right_power}")
                 elif msg == DUAL_FATES_RESULT:
-                    conn.send(b"left" if left_power > right_power else b"right")
+                    conn.send(b"Left" if left_power > right_power else b"Right")
                 elif msg == MAZE_DONE:
                     maze_done = True
                 elif msg == DUAL_FATES_DONE:
@@ -70,6 +73,8 @@ def main():
                 # Because of the with structure we don't need to close here
                 # Also because of nested with structure it expects only one message per new connection
                 # This avoids starvation of one robot hogging the server
+
+    powercalc.terminate()
 
 
 signal.signal(signal.SIGINT, handler)

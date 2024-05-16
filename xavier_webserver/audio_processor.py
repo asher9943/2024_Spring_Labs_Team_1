@@ -57,7 +57,6 @@ class PowerCalculator:
         # stop recording
         stream.stop_stream()
         stream.close()
-        self.audio.terminate()
 
         # create the output files
         waveFile = wave.open("data.wav", "wb")
@@ -72,3 +71,6 @@ class PowerCalculator:
 
         # compute and return power
         return np.sqrt(np.mean(data.astype(float) ** 2))
+
+    def terminate(self):
+        self.audio.terminate()
