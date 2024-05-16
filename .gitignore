@@ -14,3 +14,7 @@ lab-2/
 env/
 
 tutorial-3-env
+
+server_env/
+
+*.pyc
