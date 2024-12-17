@@ -12,22 +12,22 @@
 /**
  * Transitions using a right turn
 */
-void transition_right(Encoder enc1) {
+void transition_right(int forward) {
     
-    moveForwardDist(true, 600);
+    moveForwardDist(true, forward);
     delay(100);
     turnAngle(-90);
     delay(100);
-    moveForwardDist(true, 600);
+    moveForwardDist(true, 450);
 }
 
 /**
  * Transitions using a left turn
 */
-void transition_left(Encoder enc1) {
-    moveForwardDist(true, 600);
+void transition_left(int forward) {
+    moveForwardDist(true, forward);
     delay(100);
-    turnAngle(90);
+    turnAngle(85);
     delay(100);
-    moveForwardDist(true, 600);
+    moveForwardDist(true, 450);
 }
